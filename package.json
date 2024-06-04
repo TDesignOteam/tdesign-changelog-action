@@ -1,6 +1,6 @@
 {
   "name": "auto-release",
-  "version": "1.0.4",
+  "version": "0.0.1",
   "description": "自动生成 pr 日志",
   "main": "index.js",
   "scripts": {
@@ -19,10 +19,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/94dreamer/auto-release.git"
+    "url": "git+https://github.com/TDesignOteam/tdesign-changelog-action.git"
   },
   "bugs": {
-    "url": "https://github.com/94dreamer/auto-release/issues"
+    "url": "https://github.com/TDesignOteam/tdesign-changelog-action/issues"
   },
-  "homepage": "https://github.com/94dreamer/auto-release#readme"
+  "homepage": "https://github.com/TDesignOteam/tdesign-changelog-action#readme"
 }
