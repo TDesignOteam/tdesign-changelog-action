@@ -43,7 +43,7 @@ const Renderer = {
                 return
             }
             // 在 pr body 明确填了 跳过 label
-            if (pr.body.indexOf('[x] 本条 PR 不需要纳入 changelog') !== -1) {
+            if (/\[x\] 本条 PR 不需要纳入 changelog/i.test(pr.body)) {
                 console.log('pr ', pr.number, ' 显示不需要纳入 changelog')
                 return
             }
