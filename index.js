@@ -3,6 +3,7 @@ const core = require('@actions/core')
 const github = require('@actions/github')
 const dayjs = require('dayjs')
 const { Octokit } = require('@octokit/rest')
+const exec = require('@actions/exec')
 const Renderer = require('./renderer')
 
 const context = github.context
@@ -50,17 +51,16 @@ const octokit = new Octokit({ auth: GITHUB_TOKEN })
  */
 
 async function generatorLogStart() {
-  const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
-  const version = pkg.version
-
   const [owner, repo] = context.payload.repository.full_name.split('/')
+  core.info(`owner:${owner}, repo:${repo}`)
 
-  console.log('owner, repo', owner, repo)
+  const tag_name = getTagName()
+  core.info(`tag_name:${tag_name}`)
 
   const releases = await octokit.rest.repos.generateReleaseNotes({
     owner,
     repo,
-    tag_name: version, // 'package.version'
+    tag_name, // 'package.version'
     target_commitish: 'develop', // 也可以从上下文中拿
   })
 
@@ -83,6 +83,28 @@ async function generatorLogStart() {
 
   setActionOutput(logRelease)
   return logRelease
+}
+
+async function getTagName() {
+  let latestTag = '0.0.0'
+
+  try {
+    await exec.exec('git describe --tags --abbrev=0', [], {
+      listeners: {
+        stdout: (data) => {
+          latestTag = data.toString().trim()
+        },
+      },
+    })
+  }
+  catch (error) {
+    core.error(`Error executing git describe: ${error.message}`)
+  }
+
+  if (!latestTag) {
+    core.info('No tags found in the repository.')
+    latestTag = '0.0.0'
+  }
 }
 
 generatorLogStart().catch((error) => {
