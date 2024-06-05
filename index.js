@@ -1,9 +1,7 @@
-const fs = require('node:fs')
 const core = require('@actions/core')
 const github = require('@actions/github')
 const dayjs = require('dayjs')
 const { Octokit } = require('@octokit/rest')
-const exec = require('@actions/exec')
 const Renderer = require('./renderer')
 
 const context = github.context
@@ -87,24 +85,16 @@ async function generatorLogStart() {
 
 async function getTagName() {
   let latestTag = '0.0.0'
-
-  try {
-    await exec.exec('git describe --tags --abbrev=0', [], {
-      listeners: {
-        stdout: (data) => {
-          latestTag = data.toString().trim()
-        },
-      },
-    })
-  }
-  catch (error) {
-    core.error(`Error executing git describe: ${error.message}`)
+  const [owner, repo] = context.payload.repository.full_name.split('/')
+  const release = await octokit.rest.repos.getLatestRelease({
+    owner,
+    repo,
+  })
+  if (release?.tag_name) {
+    latestTag = release.tag_name
   }
 
-  if (!latestTag) {
-    core.info('No tags found in the repository.')
-    latestTag = '0.0.0'
-  }
+  return latestTag
 }
 
 generatorLogStart().catch((error) => {
