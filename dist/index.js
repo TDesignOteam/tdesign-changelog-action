@@ -35244,7 +35244,7 @@ async function generatorLogStart() {
   const [owner, repo] = context.payload.repository.full_name.split('/')
   core.info(`owner:${owner}, repo:${repo}`)
 
-  const tag_name = getTagName()
+  const tag_name = await getTagName()
   core.info(`tag_name:${tag_name}`)
 
   const releases = await octokit.rest.repos.generateReleaseNotes({
