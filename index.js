@@ -86,12 +86,15 @@ async function generatorLogStart() {
 async function getTagName() {
   let latestTag = '0.0.0'
   const [owner, repo] = context.payload.repository.full_name.split('/')
-  const release = await octokit.rest.repos.getLatestRelease({
-    owner,
-    repo,
-  })
-  if (release?.tag_name) {
+  try {
+    const release = await octokit.rest.repos.getLatestRelease({
+      owner,
+      repo,
+    })
     latestTag = release.tag_name
+  }
+  catch (error) {
+    core.error(error.message)
   }
 
   return latestTag
