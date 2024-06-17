@@ -32139,6 +32139,22 @@ module.exports = require("node:events");
 
 /***/ }),
 
+/***/ 7561:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:fs");
+
+/***/ }),
+
+/***/ 7742:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:process");
+
+/***/ }),
+
 /***/ 4492:
 /***/ ((module) => {
 
@@ -33933,6 +33949,8 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
+const fs = __nccwpck_require__(7561)
+const process = __nccwpck_require__(7742)
 const core = __nccwpck_require__(7292)
 const github = __nccwpck_require__(4877)
 const dayjs = __nccwpck_require__(4397)
@@ -33942,7 +33960,7 @@ const Renderer = __nccwpck_require__(5979)
 const context = github.context
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 
-core.info(`github.context:${context}`)
+core.info(`github.context:${JSON.stringify(context)}`)
 
 // console.log('payload', context.payload);
 
@@ -33984,7 +34002,11 @@ const octokit = new Octokit({ auth: GITHUB_TOKEN })
  */
 
 async function generatorLogStart() {
-  const tag = core.getInput('tag', { required: true })
+  let tag = core.getInput('tag', { required: false })
+  if (!tag) {
+    const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
+    tag = pkg.version
+  }
   const [owner, repo] = context.payload.repository.full_name.split('/')
   core.info(`owner:${owner}, repo:${repo}`)
 

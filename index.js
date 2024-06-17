@@ -1,3 +1,5 @@
+const fs = require('node:fs')
+const process = require('node:process')
 const core = require('@actions/core')
 const github = require('@actions/github')
 const dayjs = require('dayjs')
@@ -7,7 +9,7 @@ const Renderer = require('./renderer')
 const context = github.context
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 
-core.info(`github.context:${context}`)
+core.info(`github.context:${JSON.stringify(context)}`)
 
 // console.log('payload', context.payload);
 
@@ -49,7 +51,11 @@ const octokit = new Octokit({ auth: GITHUB_TOKEN })
  */
 
 async function generatorLogStart() {
-  const tag = core.getInput('tag', { required: true })
+  let tag = core.getInput('tag', { required: false })
+  if (!tag) {
+    const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
+    tag = pkg.version
+  }
   const [owner, repo] = context.payload.repository.full_name.split('/')
   core.info(`owner:${owner}, repo:${repo}`)
 
