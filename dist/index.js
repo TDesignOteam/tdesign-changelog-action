@@ -33942,7 +33942,7 @@ const Renderer = __nccwpck_require__(5979)
 const context = github.context
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 
-console.log('context.github', context)
+core.info(`github.context:${context}`)
 
 // console.log('payload', context.payload);
 
@@ -33984,16 +33984,14 @@ const octokit = new Octokit({ auth: GITHUB_TOKEN })
  */
 
 async function generatorLogStart() {
+  const tag = core.getInput('tag', { required: true })
   const [owner, repo] = context.payload.repository.full_name.split('/')
   core.info(`owner:${owner}, repo:${repo}`)
-
-  const tag_name = await getTagName()
-  core.info(`tag_name:${tag_name}`)
 
   const releases = await octokit.rest.repos.generateReleaseNotes({
     owner,
     repo,
-    tag_name, // 'package.version'
+    tag_name: tag, // 'package.version'
     target_commitish: 'develop', // 也可以从上下文中拿
   })
 
@@ -34007,32 +34005,15 @@ async function generatorLogStart() {
 
   const PRList = PRListRes.map(res => res.data)
 
-  console.log('JSON.stringify(PRList)', JSON.stringify(PRList))
+  core.info('JSON.stringify(PRList)', JSON.stringify(PRList))
 
   const logRelease = `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
-## 🌈 ${version} \`${dayjs().format('YYYY-MM-DD')}\` \n${Renderer.renderMarkdown(PRList)}\n`
+## 🌈 ${tag} \`${dayjs().format('YYYY-MM-DD')}\` \n${Renderer.renderMarkdown(PRList)}\n`
 
-  console.log(logRelease)
+  core.info(logRelease)
 
   setActionOutput(logRelease)
   return logRelease
-}
-
-async function getTagName() {
-  let latestTag = '0.0.0'
-  const [owner, repo] = context.payload.repository.full_name.split('/')
-  try {
-    const release = await octokit.rest.repos.getLatestRelease({
-      owner,
-      repo,
-    })
-    latestTag = release.tag_name
-  }
-  catch (error) {
-    core.error(error.message)
-  }
-
-  return latestTag
 }
 
 generatorLogStart().catch((error) => {

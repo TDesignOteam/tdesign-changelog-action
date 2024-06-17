@@ -19,10 +19,16 @@ jobs:
     steps:
       - run: echo "The head of this PR starts with 'release/'"
       - uses: actions/checkout@v4
+      - uses: TDesignOteam/tdesign-tag-action@develop
+        id: tag-action
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: TDesignOteam/tdesign-changelog-action@develop
         id: changelog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ steps.tag-action.outputs.version }}  
       - name: Add comment
         uses: peter-evans/create-or-update-comment@v4
         with:
