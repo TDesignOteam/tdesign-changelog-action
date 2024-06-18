@@ -1,6 +1,11 @@
+
+
 ## 🌈 0.1.0 `2024-06-18` 
 ### 🚀 Features
-- `CI`: 推送`tag`后自动合并`develop` 到 `main` 分支 @liweijie0812 ([#16](https://github.com/TDesignOteam/tdesign-changelog-action/pull/16))## 🌈 0.0.2 `2024-06-18` 
+- `CI`: 推送`tag`后自动合并`develop` 到 `main` 分支 @liweijie0812 ([#16](https://github.com/TDesignOteam/tdesign-changelog-action/pull/16))
+
+
+## 🌈 0.0.2 `2024-06-18` 
 ### 🚀 Features
 - 兼容`tdesign-flutter`可外部传入`tag`
 
