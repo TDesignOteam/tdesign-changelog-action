@@ -1,5 +1,9 @@
 
 
+## 🌈 0.1.2 `2024-06-19` 
+### 🐞 Bug Fixes
+- `CI`: 推送 `tag` 后没触发合并`develop`到`main` @liweijie0812 ([#20](https://github.com/TDesignOteam/tdesign-changelog-action/pull/20))
+
 ## 🌈 0.1.1 `2024-06-18` 
 ### 🐞 Bug Fixes
 - `CI`: `tag_push`不工作 @liweijie0812 ([#18](https://github.com/TDesignOteam/tdesign-changelog-action/pull/18))
