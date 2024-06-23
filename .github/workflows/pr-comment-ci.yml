@@ -5,7 +5,7 @@ on:
     types: [created]
 
 jobs:
-  check-collaborator:
+  check:
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request }}
     steps:
@@ -27,11 +27,15 @@ jobs:
             }
             core.info(`next_action: ${next_action}`)
             core.setOutput('next_action', next_action)
-
-  update-build:
-    needs: check-collaborator
+  output-next-action:
+    needs: check
     runs-on: ubuntu-latest
-    if: ${{ needs.check-collaborator.outputs.next_action == 'update-build' }}
+    steps:
+      - run: echo ${{ needs.check.outputs.next_action }}    
+  update-build:
+    needs: check
+    runs-on: ubuntu-latest
+    if: ${{ needs.check.outputs.next_action == 'update-build' }}
     steps:
       - uses: actions/checkout@v4
       - name: gh checkout pr
