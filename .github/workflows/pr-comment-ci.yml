@@ -1,4 +1,4 @@
-name: bot-ci
+name: PR_COMMENT_CI
 
 on:
   issue_comment:
@@ -9,14 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request }}
     steps:
+       - uses: actions/checkout@v4
        - uses: actions/github-script@v7
-         env: 
-          CODEOWNERS: .github/CODEOWNERS
          with:
           script: |
             let next_action = ''
             const fs = require('fs')
-            const CODEOWNERS = fs.readFileSync(process.env.CODEOWNERS, 'utf8')
+            const CODEOWNERS = fs.readFileSync('.github/CODEOWNERS', 'utf8')
             if (CODEOWNERS.includes(`@${context.payload.comment.user.login}`)) {
               console.log('Allowed')
               const body = context.payload.comment.body
