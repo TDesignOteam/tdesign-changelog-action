@@ -11,6 +11,7 @@ jobs:
     steps:
        - uses: actions/checkout@v4
        - uses: actions/github-script@v7
+         id: next-action
          with:
           script: |
             let next_action = ''
@@ -26,16 +27,16 @@ jobs:
                core.warning('You are not collaborator');
             }
             core.info(`next_action: ${next_action}`)
-            core.setOutput('next_action', next_action)
+            return next_action
   output-next-action:
     needs: check
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ needs.check.outputs.next_action }}    
+      - run: echo ${{ needs.check.outputs.result }}
   update-build:
     needs: check
     runs-on: ubuntu-latest
-    if: ${{ needs.check.outputs.next_action == 'update-build' }}
+    if: ${{ needs.check.outputs.result == 'update-build' }}
     steps:
       - uses: actions/checkout@v4
       - name: gh checkout pr
