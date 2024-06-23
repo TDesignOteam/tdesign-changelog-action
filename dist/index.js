@@ -33959,7 +33959,7 @@ const Renderer = __nccwpck_require__(5979)
 
 const context = github.context
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
-
+core.info('test ci')
 core.info(`github.context:${JSON.stringify(context)}`)
 
 core.info(`payload:${JSON.stringify(context.payload)}`)
