@@ -23,10 +23,11 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.event.comment.body, '/update-build')
     steps:
+      - uses: actions/checkout@v4
       - name: gh checkout pr
         env:
           GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
-        run: gh pr checkout ${{ github.event.issue.number }}
+        run: gh pr checkout ${{ github.event.pull_request.number }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
