@@ -7,6 +7,8 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    outputs:
+      next_action: ${{ steps.get-action.outputs.next_action }}
     if: ${{ github.event.issue.pull_request }}
     steps:
        - uses: actions/checkout@v4
@@ -33,11 +35,12 @@ jobs:
     needs: check
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ needs.check.get-action.outputs.next_action }}
+      - run: echo ${{ needs.check.outputs.next_action }}
+      
   update-build:
     needs: check
     runs-on: ubuntu-latest
-    if: ${{ needs.check.get-action.outputs.next_action == 'update-build' }}
+    if: ${{ needs.check.outputs.next_action == 'update-build' }}
     steps:
       - uses: actions/checkout@v4
       - name: gh checkout pr
