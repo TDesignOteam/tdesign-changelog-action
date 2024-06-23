@@ -1,0 +1,36 @@
+name: bot-ci
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  check-collaborator:
+    runs-on: ubuntu-latest
+    if: github.event.issue.pull_request
+    steps:
+       - uses: actions/github-script@v7
+         with:
+          script: |
+            if (context.payload.comment.user.login=='liweijie0812'){
+              console.log('Allowed')
+            }
+            else {
+              core.setFailed('You are not collaborator');
+            }
+  update-build:
+    needs: check-collaborator
+    runs-on: ubuntu-latest
+    if:  startsWith(github.event.comment.body, '/update-build')
+    steps:
+      - uses: actions/checkout@v4
+      - run: pnpm install
+      - run: pnpm build
+      - name: Commit build
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+        run: |
+          git add .
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "chore: build"
+          git push
