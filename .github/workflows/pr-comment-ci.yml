@@ -25,7 +25,7 @@ jobs:
             } else {
                core.warning('You are not collaborator');
             }
-
+            core.info(`next_action: ${next_action}`)
             core.setOutput('next_action', next_action)
 
   update-build:
