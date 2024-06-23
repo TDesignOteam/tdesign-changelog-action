@@ -11,7 +11,7 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 
 core.info(`github.context:${JSON.stringify(context)}`)
 
-// console.log('payload', context.payload);
+core.info(`payload:${JSON.stringify(context.payload)}`)
 
 if (!GITHUB_TOKEN) {
   throw new Error(
