@@ -23,11 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.event.comment.body, '/update-build')
     steps:
-      - uses: xt0rted/pull-request-comment-branch@v2
-        id: comment-branch
       - uses: actions/checkout@v4
         with:
-          ref: ${{ steps.comment-branch.outputs.head_ref }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
