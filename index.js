@@ -8,7 +8,7 @@ const Renderer = require('./renderer')
 
 const context = github.context
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
-
+core.info('test ci')
 core.info(`github.context:${JSON.stringify(context)}`)
 
 core.info(`payload:${JSON.stringify(context.payload)}`)
