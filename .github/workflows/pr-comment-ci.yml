@@ -17,7 +17,7 @@ jobs:
          with:
           script: |
             let next_action = ''
-            const fs = require('fs')
+            const fs = import('fs')
             const CODEOWNERS = fs.readFileSync('.github/CODEOWNERS', 'utf8')
             const isReviewer = false;
             CODEOWNERS.match(/@\w+/g).forEach((owner) => {
