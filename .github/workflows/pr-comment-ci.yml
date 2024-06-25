@@ -16,8 +16,6 @@ jobs:
          id: get-action
          with:
           script: |
-            let next_action = ''
-            let isReviewer = false;
             const user = context.payload.comment.user.login
             core.debug(`user: ${user}`)
 
@@ -25,11 +23,14 @@ jobs:
             const CODEOWNERS = fs.readFileSync('.github/CODEOWNERS', 'utf8')
             core.debug(`CODEOWNERS: ${CODEOWNERS}`)
 
+            let isReviewer = false;
             CODEOWNERS.match(/@\w+/g).forEach((owner) => {
               if (owner === `@${user}`) {
                 isReviewer = true
               }
             })
+
+            let next_action = ''
             if (isReviewer) {
               console.log('Allowed')
               const body = context.payload.comment.body
