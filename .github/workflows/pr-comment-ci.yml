@@ -19,12 +19,18 @@ jobs:
             let next_action = ''
             const fs = require('fs')
             const CODEOWNERS = fs.readFileSync('.github/CODEOWNERS', 'utf8')
-            if (CODEOWNERS.includes(`@${context.payload.comment.user.login}`)) {
+            const isReviewer = false;
+            CODEOWNERS.match(/@\w+/g).forEach((owner) => {
+              if (owner === `@${context.payload.comment.user.login}`) {
+                isReviewer = true
+              }
+            })
+            if (isReviewer) {
               console.log('Allowed')
               const body = context.payload.comment.body
-              if (body.startsWith('/update-build')) {
-                next_action='update-build'
-              } 
+              if (body.startsWith('/update-dist')) {
+                next_action='update-dist'
+              }
             } else {
                core.warning('You are not collaborator');
             }
@@ -36,11 +42,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo ${{ needs.check.outputs.next_action }}
-      
-  update-build:
+
+  update-dist:
     needs: check
     runs-on: ubuntu-latest
-    if: ${{ needs.check.outputs.next_action == 'update-build' }}
+    if: ${{ needs.check.outputs.next_action == 'update-dist' }}
     steps:
       - uses: actions/checkout@v4
       - name: gh checkout pr
