@@ -1,10 +1,10 @@
-const fs = require('node:fs')
-const process = require('node:process')
-const core = require('@actions/core')
-const github = require('@actions/github')
-const dayjs = require('dayjs')
-const { Octokit } = require('@octokit/rest')
-const Renderer = require('./renderer')
+import fs from 'node:fs'
+import process from 'node:process'
+import core from '@actions/core'
+import github from '@actions/github'
+import dayjs from 'dayjs'
+import { Octokit } from '@octokit/rest'
+import Renderer from './renderer'
 
 const context = github.context
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
@@ -76,7 +76,7 @@ async function generatorLogStart() {
 
   const PRList = PRListRes.map(res => res.data)
 
-  core.info('JSON.stringify(PRList)', JSON.stringify(PRList))
+  core.info(`PRList:${JSON.stringify(PRList)}`)
 
   const logRelease = `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
 ## 🌈 ${tag} \`${dayjs().format('YYYY-MM-DD')}\` \n${Renderer.renderMarkdown(PRList)}\n`
@@ -92,6 +92,6 @@ generatorLogStart().catch((error) => {
   core.setFailed(`💥 Auto Release failed with error: ${error.message}`)
 })
 
-function setActionOutput(changelog) {
+function setActionOutput(changelog: string) {
   core.setOutput('changelog', changelog)
 }
