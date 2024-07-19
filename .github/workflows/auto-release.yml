@@ -5,7 +5,7 @@ on:
     branches: [develop]
     types: [opened, synchronize, reopened, closed]
     paths:
-      - 'package.json'
+      - package.json
   issue_comment:
     types: [edited]
 
@@ -28,7 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag: ${{ steps.tag-action.outputs.version }}  
+          tag: ${{ steps.tag-action.outputs.version }}
       - name: Add comment
         uses: peter-evans/create-or-update-comment@v4
         with:
@@ -85,7 +85,7 @@ jobs:
       - uses: TDesignOteam/tdesign-tag-action@main
         id: tag-action
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}    
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: tag and push if needed
         run: |
           echo "${{ steps.tag-action.outputs.version }}"
