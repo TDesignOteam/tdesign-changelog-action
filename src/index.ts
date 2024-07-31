@@ -4,7 +4,7 @@ import core from '@actions/core'
 import github from '@actions/github'
 import dayjs from 'dayjs'
 import { Octokit } from '@octokit/rest'
-import Renderer from './renderer'
+import Renderer from './renderer.js'
 
 const context = github.context
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
@@ -56,7 +56,7 @@ async function generatorLogStart() {
     const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
     tag = pkg.version
   }
-  const [owner, repo] = context.payload.repository.full_name.split('/')
+  const { owner, repo } = context.repo
   core.info(`owner:${owner}, repo:${repo}`)
 
   const releases = await octokit.rest.repos.generateReleaseNotes({
