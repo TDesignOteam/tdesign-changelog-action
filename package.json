@@ -18,6 +18,7 @@
     "node": ">=20"
   },
   "scripts": {
+    "prebuild": "rimraf dist/* --glob",
     "build": "ncc build src/index.ts -o dist --license licenses.txt",
     "lint": "eslint . ",
     "lint:fix": "eslint . --fix",
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^2.23.0",
     "eslint": "^9.7.0",
+    "rimraf": "^6.0.1",
     "typescript": "^5.5.3"
   }
 }
