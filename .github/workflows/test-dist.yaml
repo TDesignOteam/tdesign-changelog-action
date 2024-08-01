@@ -13,8 +13,6 @@ jobs:
         id: changelog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag: ${{ steps.tag-action.outputs.version }}
       - name: Add comment
         uses: peter-evans/create-or-update-comment@v4
         with:
