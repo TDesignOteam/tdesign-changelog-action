@@ -1,0 +1,23 @@
+name: test dist
+on:
+    pull_request:
+      branches: [develop]
+      
+jobs:
+  generator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: changelog
+        uses: TDesignOteam/tdesign-changelog-action@${{ github.head_ref }}
+        id: changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ steps.tag-action.outputs.version }}
+      - name: Add comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ${{ steps.changelog.outputs.changelog }}
