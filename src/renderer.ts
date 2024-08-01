@@ -1,5 +1,5 @@
 import core from '@actions/core'
-import type { PullsData } from './types.js'
+import type { PRChangelog, PullsData } from './types.js'
 
 const skipchangelogLabel = ['skip-changelog']
 const fixLabel = ['fix', 'bug', 'hotfix']
@@ -14,14 +14,14 @@ const Renderer = {
 
     return arr.map(n => Number(n[1])) // pr number list
   },
-  regToPrObj: (arr) => {
+  regToPrObj: (arr: string[]) => {
     return {
       cate: arr[1],
       component: arr[2],
       desc: arr[3],
     }
   },
-  renderCate: (cate: PullsData[]) => {
+  renderCate: (cate: PRChangelog[]) => {
     return `${cate.sort().map((pr) => {
             const title = pr.changelog ? `\`${pr.changelog.component}\`: ${pr.changelog.desc}` : pr.title
             return `- ${title} @${pr.user.login} ([#${pr.number}](${pr.html_url}))`
@@ -31,10 +31,10 @@ const Renderer = {
     // 分类靠标签
     // 标题看有没有更新日志
     const categories = {
-      breaking: [] as PullsData[],
-      features: [] as PullsData[],
-      bugfix: [] as PullsData[],
-      extra: [] as PullsData[],
+      breaking: [] as PRChangelog[],
+      features: [] as PRChangelog[],
+      bugfix: [] as PRChangelog[],
+      extra: [] as PRChangelog[],
     }
 
     pullRequestList.forEach((pr) => {
@@ -68,7 +68,7 @@ const Renderer = {
             changelog,
           }
 
-          function isInLabel(label) {
+          function isInLabel(label: string[]) {
             return label.includes(changelog.cate) || (arr.length === 1 && pr.labels.some(l => label.includes(l.name)))
           }
 

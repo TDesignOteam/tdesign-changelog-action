@@ -5,6 +5,7 @@ import github from '@actions/github'
 import dayjs from 'dayjs'
 import { Octokit } from '@octokit/rest'
 import Renderer from './renderer.js'
+import type { PullsData } from './types.js'
 
 const context = github.context
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
@@ -74,7 +75,7 @@ async function generatorLogStart() {
     pull_number,
   })))
 
-  const PRList = PRListRes.map(res => res.data)
+  const PRList = PRListRes.map(res => res.data as PullsData)
 
   core.info(`PRList:${JSON.stringify(PRList)}`)
 
