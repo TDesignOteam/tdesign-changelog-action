@@ -4,8 +4,8 @@ import core from '@actions/core'
 import github from '@actions/github'
 import dayjs from 'dayjs'
 import { Octokit } from '@octokit/rest'
-import Renderer from './renderer.js'
-import type { PullsData } from './types.js'
+import Renderer from './renderer'
+import type { PullsData } from './types'
 
 const context = github.context
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN

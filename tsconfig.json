@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "rootDir": "./src",
-    "module": "node16",
-    "moduleResolution": "node16",
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
     "strict": true,
-    "noImplicitAny": true,
-    "outDir": "./dist",
-    "esModuleInterop": true
-  },
-  "exclude": ["node_modules", "./dist", "./test"]
+    "strictNullChecks": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true
+  }
 }

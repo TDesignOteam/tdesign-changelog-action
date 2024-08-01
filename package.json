@@ -2,6 +2,7 @@
   "name": "tdesign-changelog-action",
   "type": "module",
   "version": "0.1.2",
+  "private": true,
   "description": "自动生成 pr 日志",
   "author": "tdesign",
   "license": "MIT",
@@ -13,15 +14,23 @@
   "bugs": {
     "url": "https://github.com/TDesignOteam/tdesign-changelog-action/issues"
   },
-  "exports": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.mjs",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "prebuild": "rimraf dist/* --glob",
-    "build": "ncc build src/index.ts -o dist --license licenses.txt",
+    "build": "unbuild",
+    "build:cjs": "ncc build src/index.ts -o dist",
     "lint": "eslint . ",
     "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -38,6 +47,7 @@
     "@antfu/eslint-config": "^2.23.0",
     "eslint": "^9.7.0",
     "rimraf": "^6.0.1",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "unbuild": "^2.0.0"
   }
 }

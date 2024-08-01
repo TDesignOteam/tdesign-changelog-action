@@ -1,5 +1,5 @@
 import core from '@actions/core'
-import type { PRChangelog, PullsData } from './types.js'
+import type { PRChangelog, PullsData } from './types'
 
 const skipchangelogLabel = ['skip-changelog']
 const fixLabel = ['fix', 'bug', 'hotfix']
