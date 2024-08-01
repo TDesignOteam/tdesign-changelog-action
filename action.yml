@@ -10,4 +10,4 @@ outputs:
     description: 日志
 runs:
   using: node20
-  main: dist/index.cjs
+  main: dist/index.mjs
