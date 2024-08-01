@@ -16,7 +16,8 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     }
   },
@@ -25,7 +26,6 @@
     "node": ">=20"
   },
   "scripts": {
-    "prebuild": "rimraf dist/* --glob",
     "build": "unbuild",
     "build:cjs": "ncc build src/index.ts -o dist",
     "lint": "eslint . ",
