@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import process from 'node:process';
 import * as core from '@actions/core';
-import core__default from '@actions/core';
 import * as github from '@actions/github';
 import dayjs from 'dayjs';
 import { Octokit } from '@octokit/rest';
@@ -39,18 +38,18 @@ const Renderer = {
     pullRequestList.forEach((pr) => {
       pr.body = pr.body ? pr.body : "";
       if (pr.labels.find((l) => skipchangelogLabel.includes(l.name))) {
-        core__default.info(`pr ${pr.number} \u6709skipchangelogLabel`);
+        core.info(`pr ${pr.number} \u6709skipchangelogLabel`);
         return;
       }
       if (/\[x\] 本条 PR 不需要纳入 changelog/i.test(pr.body)) {
-        core__default.info(`pr ${pr.number} \u663E\u793A\u4E0D\u9700\u8981\u7EB3\u5165 changelog`);
+        core.info(`pr ${pr.number} \u663E\u793A\u4E0D\u9700\u8981\u7EB3\u5165 changelog`);
         return;
       }
       if (pr.body.includes("### \u{1F4DD} \u66F4\u65B0\u65E5\u5FD7")) {
         const reg = /-\s([A-Z]+)\(([A-Z]+)\):\s(.+)/gi;
         const arr = [...pr.body.matchAll(reg)];
         if (arr.length === 0) {
-          core__default.info(`\u6CA1\u6709\u627E\u5230\u4EFB\u4F55\u4E00\u6761\u65E5\u5FD7\u5185\u5BB9 number:${pr.number}, body:${pr.body}`);
+          core.info(`\u6CA1\u6709\u627E\u5230\u4EFB\u4F55\u4E00\u6761\u65E5\u5FD7\u5185\u5BB9 number:${pr.number}, body:${pr.body}`);
           categories.extra.push(pr);
           return;
         }
@@ -73,7 +72,7 @@ const Renderer = {
           }
         });
       } else {
-        core__default.info(`pr ${pr.number} \u6CA1\u6709\u586B\u5199\u6A21\u7248`);
+        core.info(`pr ${pr.number} \u6CA1\u6709\u586B\u5199\u6A21\u7248`);
         categories.extra.push(pr);
       }
     });

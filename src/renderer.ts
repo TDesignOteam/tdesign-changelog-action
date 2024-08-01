@@ -1,4 +1,4 @@
-import core from '@actions/core'
+import * as core from '@actions/core'
 import type { PRChangelog, PullsData } from './types'
 
 const skipchangelogLabel = ['skip-changelog']
