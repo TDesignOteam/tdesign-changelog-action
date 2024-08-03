@@ -1,4 +1,4 @@
-import * as core from '@actions/core'
+import { info } from '@actions/core'
 import type { PRChangelog, PullsData } from './types'
 
 const skipchangelogLabel = ['skip-changelog']
@@ -42,12 +42,12 @@ const Renderer = {
 
       // 不需要纳入 changelog 的 label
       if (pr.labels.find(l => skipchangelogLabel.includes(l.name))) {
-        core.info(`pr ${pr.number} 有skipchangelogLabel`)
+        info(`pr ${pr.number} 有skipchangelogLabel`)
         return
       }
       // 在 pr body 明确填了 跳过 label
       if (/\[x\] 本条 PR 不需要纳入 changelog/i.test(pr.body)) {
-        core.info(`pr ${pr.number} 显示不需要纳入 changelog`)
+        info(`pr ${pr.number} 显示不需要纳入 changelog`)
         return
       }
 
@@ -57,7 +57,7 @@ const Renderer = {
         const arr = [...pr.body.matchAll(reg)]
 
         if (arr.length === 0) {
-          core.info(`没有找到任何一条日志内容 number:${pr.number}, body:${pr.body}`)
+          info(`没有找到任何一条日志内容 number:${pr.number}, body:${pr.body}`)
           categories.extra.push(pr)
           return
         }
@@ -88,7 +88,7 @@ const Renderer = {
       }
       else {
         // 说明开发者没有按模版填写 pr，默认取 title
-        core.info(`pr ${pr.number} 没有填写模版`)
+        info(`pr ${pr.number} 没有填写模版`)
         categories.extra.push(pr) // ??
       }
     })

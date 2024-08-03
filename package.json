@@ -1,6 +1,5 @@
 {
   "name": "tdesign-changelog-action",
-  "type": "module",
   "version": "0.1.2",
   "private": true,
   "description": "自动生成 pr 日志",
@@ -14,20 +13,13 @@
   "bugs": {
     "url": "https://github.com/TDesignOteam/tdesign-changelog-action/issues"
   },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "main": "./dist/index.mjs",
+  "main": "./src/index.ts",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "build": "unbuild",
-    "build:cjs": "ncc build src/index.ts -o dist",
+    "prebuild": "rimraf dist/*  ",
+    "build": "ncc build --license license.txt",
     "lint": "eslint . ",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
@@ -38,16 +30,15 @@
     "@actions/github": "^5.1.1",
     "@octokit/plugin-rest-endpoint-methods": "^13.2.4",
     "@octokit/rest": "^18.12.0",
-    "@types/node": "^20.14.11",
+    "@types/node": "^20.14.13",
     "@vercel/ncc": "^0.33.4",
     "dayjs": "^1.11.12",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.23.0",
-    "eslint": "^9.7.0",
+    "@antfu/eslint-config": "^2.24.1",
+    "eslint": "^9.8.0",
     "rimraf": "^6.0.1",
-    "typescript": "^5.5.3",
-    "unbuild": "^2.0.0"
+    "typescript": "^5.5.4"
   }
 }
