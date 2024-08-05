@@ -1,15 +1,15 @@
-const fs = require('node:fs')
-const process = require('node:process')
-const core = require('@actions/core')
-const github = require('@actions/github')
-const dayjs = require('dayjs')
-const { Octokit } = require('@octokit/rest')
-const Renderer = require('./renderer')
+import fs from 'node:fs'
+import process from 'node:process'
+import { getInput, info, setFailed, setOutput } from '@actions/core'
+import { context, getOctokit } from '@actions/github'
+import dayjs from 'dayjs'
+import { Octokit } from '@octokit/rest'
+import Renderer from './renderer'
+import type { PullsData } from './types'
 
-const context = github.context
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 
-core.info(`github.context:${JSON.stringify(context)}`)
+info(`github.context:${JSON.stringify(context)}`)
 
 // console.log('payload', context.payload);
 
@@ -19,7 +19,7 @@ if (!GITHUB_TOKEN) {
   )
 }
 
-const octokit = new Octokit({ auth: GITHUB_TOKEN })
+const octokit = getOctokit(GITHUB_TOKEN)
 /**
  *
 # 1. 监听 release分支到develop的pr ，拉取当前 ref 和上一个 tag 的ref 的compare中的所有pr
@@ -51,13 +51,13 @@ const octokit = new Octokit({ auth: GITHUB_TOKEN })
  */
 
 async function generatorLogStart() {
-  let tag = core.getInput('tag', { required: false })
+  let tag = getInput('tag', { required: false })
   if (!tag) {
     const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
     tag = pkg.version
   }
-  const [owner, repo] = context.payload.repository.full_name.split('/')
-  core.info(`owner:${owner}, repo:${repo}`)
+  const { owner, repo } = context.repo
+  info(`owner:${owner}, repo:${repo}`)
 
   const releases = await octokit.rest.repos.generateReleaseNotes({
     owner,
@@ -74,14 +74,14 @@ async function generatorLogStart() {
     pull_number,
   })))
 
-  const PRList = PRListRes.map(res => res.data)
+  const PRList = PRListRes.map(res => res.data as PullsData)
 
-  core.info('JSON.stringify(PRList)', JSON.stringify(PRList))
+  info(`PRList:${JSON.stringify(PRList)}`)
 
   const logRelease = `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
 ## 🌈 ${tag} \`${dayjs().format('YYYY-MM-DD')}\` \n${Renderer.renderMarkdown(PRList)}\n`
 
-  core.info(logRelease)
+  info(logRelease)
 
   setActionOutput(logRelease)
   return logRelease
@@ -89,9 +89,9 @@ async function generatorLogStart() {
 
 generatorLogStart().catch((error) => {
   console.error(error)
-  core.setFailed(`💥 Auto Release failed with error: ${error.message}`)
+  setFailed(`💥 Auto Release failed with error: ${error.message}`)
 })
 
-function setActionOutput(changelog) {
-  core.setOutput('changelog', changelog)
+function setActionOutput(changelog: string) {
+  setOutput('changelog', changelog)
 }

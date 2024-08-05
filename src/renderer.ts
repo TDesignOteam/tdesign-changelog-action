@@ -1,37 +1,40 @@
+import { info } from '@actions/core'
+import type { PRChangelog, PullsData } from './types'
+
 const skipchangelogLabel = ['skip-changelog']
 const fixLabel = ['fix', 'bug', 'hotfix']
 const breakingLabel = ['breaking', 'breaking changes']
 const featureLabel = ['feature', 'feat', 'enhancement']
 
 const Renderer = {
-  getPRformtNotes: (body) => {
+  getPRformtNotes: (body: string) => {
     const reg = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)\s/g
 
     const arr = [...body.matchAll(reg)]
 
-    return arr.map(n => n[1]) // pr number list
+    return arr.map(n => Number(n[1])) // pr number list
   },
-  regToPrObj: (arr) => {
+  regToPrObj: (arr: string[]) => {
     return {
       cate: arr[1],
       component: arr[2],
       desc: arr[3],
     }
   },
-  renderCate: (cate) => {
+  renderCate: (cate: PRChangelog[]) => {
     return `${cate.sort().map((pr) => {
             const title = pr.changelog ? `\`${pr.changelog.component}\`: ${pr.changelog.desc}` : pr.title
             return `- ${title} @${pr.user.login} ([#${pr.number}](${pr.html_url}))`
         }).join('\n')}`
   },
-  renderMarkdown: (pullRequestList) => {
+  renderMarkdown: (pullRequestList: PullsData[]) => {
     // 分类靠标签
     // 标题看有没有更新日志
     const categories = {
-      breaking: [],
-      features: [],
-      bugfix: [],
-      extra: [],
+      breaking: [] as PRChangelog[],
+      features: [] as PRChangelog[],
+      bugfix: [] as PRChangelog[],
+      extra: [] as PRChangelog[],
     }
 
     pullRequestList.forEach((pr) => {
@@ -39,12 +42,12 @@ const Renderer = {
 
       // 不需要纳入 changelog 的 label
       if (pr.labels.find(l => skipchangelogLabel.includes(l.name))) {
-        console.log(`pr ${pr.number} 有skipchangelogLabel`)
+        info(`pr ${pr.number} 有skipchangelogLabel`)
         return
       }
       // 在 pr body 明确填了 跳过 label
       if (/\[x\] 本条 PR 不需要纳入 changelog/i.test(pr.body)) {
-        console.log('pr ', pr.number, ' 显示不需要纳入 changelog')
+        info(`pr ${pr.number} 显示不需要纳入 changelog`)
         return
       }
 
@@ -54,7 +57,7 @@ const Renderer = {
         const arr = [...pr.body.matchAll(reg)]
 
         if (arr.length === 0) {
-          console.log('没有找到任何一条日志内容', pr.number, pr.body)
+          info(`没有找到任何一条日志内容 number:${pr.number}, body:${pr.body}`)
           categories.extra.push(pr)
           return
         }
@@ -65,7 +68,7 @@ const Renderer = {
             changelog,
           }
 
-          function isInLabel(label) {
+          function isInLabel(label: string[]) {
             return label.includes(changelog.cate) || (arr.length === 1 && pr.labels.some(l => label.includes(l.name)))
           }
 
@@ -85,7 +88,7 @@ const Renderer = {
       }
       else {
         // 说明开发者没有按模版填写 pr，默认取 title
-        console.log('pr ', pr.number, ' 没有填写模版')
+        info(`pr ${pr.number} 没有填写模版`)
         categories.extra.push(pr) // ??
       }
     })
@@ -114,4 +117,4 @@ ${Renderer.renderCate(categories.extra)}`
   },
 }
 
-module.exports = Renderer
+export default Renderer

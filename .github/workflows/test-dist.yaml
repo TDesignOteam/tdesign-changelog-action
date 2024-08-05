@@ -1,0 +1,23 @@
+name: test dist
+on:
+    pull_request:
+      branches: [develop]
+      paths:
+        - dist/index.js
+      
+jobs:
+  generator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: changelog
+        uses: ./
+        id: changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Add comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ${{ steps.changelog.outputs.changelog }}
