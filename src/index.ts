@@ -3,8 +3,7 @@ import process from 'node:process'
 import { getInput, info, setFailed, setOutput } from '@actions/core'
 import { context, getOctokit } from '@actions/github'
 import dayjs from 'dayjs'
-import { Octokit } from '@octokit/rest'
-import Renderer from './renderer'
+import { getPReformatNotes, renderMarkdown } from './renderer'
 import type { PullsData } from './types'
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
@@ -66,7 +65,7 @@ async function generatorLogStart() {
     target_commitish: 'develop', // 也可以从上下文中拿
   })
 
-  const PRNumbers = Renderer.getPRformtNotes(releases.data.body)
+  const PRNumbers = getPReformatNotes(releases.data.body)
 
   const PRListRes = await Promise.all(PRNumbers.map(pull_number => octokit.rest.pulls.get({
     owner,
@@ -79,7 +78,7 @@ async function generatorLogStart() {
   info(`PRList:${JSON.stringify(PRList)}`)
 
   const logRelease = `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
-## 🌈 ${tag} \`${dayjs().format('YYYY-MM-DD')}\` \n${Renderer.renderMarkdown(PRList)}\n`
+## 🌈 ${tag} \`${dayjs().format('YYYY-MM-DD')}\` \n${renderMarkdown(PRList)}\n`
 
   info(logRelease)
 
