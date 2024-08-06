@@ -3,7 +3,7 @@ import type { PRChangelog, PullsData } from './types'
 
 const skipchangelogLabel = ['skip-changelog']
 const fixLabel = ['fix', 'bug', 'hotfix']
-const breakingLabel = ['breaking', 'breaking changes']
+const breakingLabel = ['break', 'breaking', 'breaking changes']
 const featureLabel = ['feature', 'feat', 'enhancement']
 
 const Renderer = {
