@@ -29305,7 +29305,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(9093);
 const skipchangelogLabel = ['skip-changelog'];
 const fixLabel = ['fix', 'bug', 'hotfix'];
-const breakingLabel = ['breaking', 'breaking changes'];
+const breakingLabel = ['break', 'breaking', 'breaking changes'];
 const featureLabel = ['feature', 'feat', 'enhancement'];
 const Renderer = {
     getPRformtNotes: (body) => {

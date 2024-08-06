@@ -3,7 +3,6 @@ import process from 'node:process'
 import { getInput, info, setFailed, setOutput } from '@actions/core'
 import { context, getOctokit } from '@actions/github'
 import dayjs from 'dayjs'
-import { Octokit } from '@octokit/rest'
 import Renderer from './renderer'
 import type { PullsData } from './types'
 
