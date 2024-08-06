@@ -2,6 +2,7 @@
   "name": "tdesign-changelog-action",
   "version": "0.2.0",
   "private": true,
+  "packageManager": "pnpm@9.6.0",
   "description": "自动生成 pr 日志",
   "author": "tdesign",
   "license": "MIT",
