@@ -10,4 +10,5 @@ export default antfu({
     quotes: 'single', // or 'double'
   },
   yaml: true,
+  typescript: true,
 })

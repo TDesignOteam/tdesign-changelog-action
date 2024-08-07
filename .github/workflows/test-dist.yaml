@@ -1,10 +1,10 @@
 name: test dist
 on:
-    pull_request:
-      branches: [develop]
-      paths:
-        - dist/index.js
-      
+  pull_request:
+    branches: [develop]
+    paths:
+      - dist/index.js
+
 jobs:
   generator:
     runs-on: ubuntu-latest

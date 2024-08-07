@@ -2,6 +2,7 @@
   "name": "tdesign-changelog-action",
   "version": "0.2.0",
   "private": true,
+  "packageManager": "pnpm@9.6.0",
   "description": "自动生成 pr 日志",
   "author": "tdesign",
   "license": "MIT",
@@ -23,12 +24,12 @@
     "lint": "eslint . ",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:update": "vitest run -u"
   },
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@actions/github": "^6.0.0",
-    "@octokit/rest": "^21.0.1",
     "dayjs": "^1.11.12"
   },
   "devDependencies": {
@@ -38,6 +39,7 @@
     "@vercel/ncc": "^0.38.1",
     "eslint": "^9.8.0",
     "rimraf": "^6.0.1",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
   }
 }
