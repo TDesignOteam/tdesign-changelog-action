@@ -14,7 +14,7 @@
   "bugs": {
     "url": "https://github.com/TDesignOteam/tdesign-changelog-action/issues"
   },
-  "main": "./src/index.ts",
+  "main": "src/index.ts",
   "engines": {
     "node": ">=20"
   },

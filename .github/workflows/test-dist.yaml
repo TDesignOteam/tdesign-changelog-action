@@ -15,6 +15,8 @@ jobs:
         id: changelog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ github.event.pull_request.head.sha }}  
       - name: Add comment
         uses: peter-evans/create-or-update-comment@v4
         with:
