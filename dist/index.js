@@ -29218,7 +29218,7 @@ const node_process_1 = __importDefault(__nccwpck_require__(7742));
 const core_1 = __nccwpck_require__(9093);
 const github_1 = __nccwpck_require__(5942);
 const dayjs_1 = __importDefault(__nccwpck_require__(9090));
-const renderer_1 = __importDefault(__nccwpck_require__(5656));
+const renderer_1 = __nccwpck_require__(5656);
 const GITHUB_TOKEN = node_process_1.default.env.GITHUB_TOKEN;
 (0, core_1.info)(`github.context:${JSON.stringify(github_1.context)}`);
 // console.log('payload', context.payload);
@@ -29226,35 +29226,6 @@ if (!GITHUB_TOKEN) {
     throw new Error('GitHub\'s API requires a token. Please pass a valid token (GITHUB_TOKEN) as an env variable, no scopes are required.');
 }
 const octokit = (0, github_1.getOctokit)(GITHUB_TOKEN);
-/**
- *
-# 1. 监听 release分支到develop的pr ，拉取当前 ref 和上一个 tag 的ref 的compare中的所有pr
-# 2. 提取 pr list 的所有 body 的 更新日志
-# 3. 根据分类格式化 的 logs 输出到模版
-# 4. 输出评论到 pr 的 comment
-# 5. 检测到 评论的 done，提交 changelog 添加到 changelog.md。
-# 6. 确任 md 更改，合并。
- 
-# 7. 监听 release 分支的合并，进行 git tag 对应version
-# 8. git tag push 监听，发包
-# 9. 监听发完包，release 这次的 changelog（从 md 或者 pr 文件取）
-# 10. 同步到微信群。（mk 内网不能同步）
-// 现有的开源工具都是根据 commit 的message 去pr查找。。。显得有点蠢
- 
-// 比较两个commit的提交
-// https://docs.github.com/en/rest/reference/commits#compare-two-commits
-// 见 compare.json 可以获取
- 
-// 列出与提交关联的拉取请求
-// https://docs.github.com/en/rest/reference/commits#list-pull-requests-associated-with-a-commit
- 
-// 行不通：尝试通过参数 head 列出请求 （最简单的方式）
-// https://docs.github.com/en/rest/reference/pulls#list-pull-requests
-// demo
- 
-// 行不通：调用 github 的 自动生成接口 这里可能存在鉴权问题，因为不是 直接的 api 接口
-// https://github.com/94dreamer/tdesign-vue-next/releases/notes?commitish=0.11.2&tag_name=0.11.2&previous_tag_name=
- */
 function generatorLogStart() {
     return __awaiter(this, void 0, void 0, function* () {
         let tag = (0, core_1.getInput)('tag', { required: false });
@@ -29270,7 +29241,7 @@ function generatorLogStart() {
             tag_name: tag, // 'package.version'
             target_commitish: 'develop', // 也可以从上下文中拿
         });
-        const PRNumbers = renderer_1.default.getPRformtNotes(releases.data.body);
+        const PRNumbers = (0, renderer_1.getPReformatNotes)(releases.data.body);
         const PRListRes = yield Promise.all(PRNumbers.map(pull_number => octokit.rest.pulls.get({
             owner,
             repo,
@@ -29279,7 +29250,7 @@ function generatorLogStart() {
         const PRList = PRListRes.map(res => res.data);
         (0, core_1.info)(`PRList:${JSON.stringify(PRList)}`);
         const logRelease = `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
-## 🌈 ${tag} \`${(0, dayjs_1.default)().format('YYYY-MM-DD')}\` \n${renderer_1.default.renderMarkdown(PRList)}\n`;
+## 🌈 ${tag} \`${(0, dayjs_1.default)().format('YYYY-MM-DD')}\` \n${(0, renderer_1.renderMarkdown)(PRList)}\n`;
         (0, core_1.info)(logRelease);
         setActionOutput(logRelease);
         return logRelease;
@@ -29302,105 +29273,104 @@ function setActionOutput(changelog) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getPReformatNotes = getPReformatNotes;
+exports.renderMarkdown = renderMarkdown;
 const core_1 = __nccwpck_require__(9093);
-const skipchangelogLabel = ['skip-changelog'];
+const skipChangelogLabel = ['skip-changelog'];
 const fixLabel = ['fix', 'bug', 'hotfix'];
 const breakingLabel = ['break', 'breaking', 'breaking changes'];
 const featureLabel = ['feature', 'feat', 'enhancement'];
-const Renderer = {
-    getPRformtNotes: (body) => {
-        const reg = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)\s/g;
-        const arr = [...body.matchAll(reg)];
-        return arr.map(n => Number(n[1])); // pr number list
-    },
-    regToPrObj: (arr) => {
-        return {
-            cate: arr[1],
-            component: arr[2],
-            desc: arr[3],
-        };
-    },
-    renderCate: (cate) => {
-        return `${cate.sort().map((pr) => {
-            const title = pr.changelog ? `\`${pr.changelog.component}\`: ${pr.changelog.desc}` : pr.title;
-            return `- ${title} @${pr.user.login} ([#${pr.number}](${pr.html_url}))`;
-        }).join('\n')}`;
-    },
-    renderMarkdown: (pullRequestList) => {
-        // 分类靠标签
-        // 标题看有没有更新日志
-        const categories = {
-            breaking: [],
-            features: [],
-            bugfix: [],
-            extra: [],
-        };
-        pullRequestList.forEach((pr) => {
-            pr.body = pr.body ? pr.body : '';
-            // 不需要纳入 changelog 的 label
-            if (pr.labels.find(l => skipchangelogLabel.includes(l.name))) {
-                (0, core_1.info)(`pr ${pr.number} 有skipchangelogLabel`);
+function getPReformatNotes(body) {
+    const reg = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)\s/g;
+    const arr = [...body.matchAll(reg)];
+    return arr.map(n => Number(n[1])); // pr number list
+}
+function regToPrObj(arr) {
+    return {
+        cate: arr[1],
+        component: arr[2],
+        desc: arr[3],
+    };
+}
+function renderCate(cate) {
+    return `${cate.sort().map((pr) => {
+        const title = pr.changelog ? `\`${pr.changelog.component}\`: ${pr.changelog.desc}` : pr.title;
+        return `- ${title} @${pr.user.login} ([#${pr.number}](${pr.html_url}))`;
+    }).join('\n')}`;
+}
+function renderMarkdown(pullRequestList) {
+    // 分类靠标签
+    // 标题看有没有更新日志
+    const categories = {
+        breaking: [],
+        features: [],
+        bugfix: [],
+        extra: [],
+    };
+    pullRequestList.forEach((pr) => {
+        pr.body = pr.body ? pr.body : '';
+        // 不需要纳入 changelog 的 label
+        if (pr.labels.find(l => skipChangelogLabel.includes(l.name))) {
+            (0, core_1.info)(`pr ${pr.number} 有skipChangelogLabel`);
+            return;
+        }
+        // 在 pr body 明确填了 跳过 label
+        if (/\[x\] 本条 PR 不需要纳入 changelog/i.test(pr.body)) {
+            (0, core_1.info)(`pr ${pr.number} 显示不需要纳入 changelog`);
+            return;
+        }
+        if (pr.body.includes('### 📝 更新日志')) {
+            const reg = /-\s([A-Z]+)\(([A-Z]+)\):\s(.+)/gi;
+            const arr = [...pr.body.matchAll(reg)];
+            if (arr.length === 0) {
+                (0, core_1.info)(`没有找到任何一条日志内容 number:${pr.number}, body:${pr.body}`);
+                categories.extra.push(pr);
                 return;
             }
-            // 在 pr body 明确填了 跳过 label
-            if (/\[x\] 本条 PR 不需要纳入 changelog/i.test(pr.body)) {
-                (0, core_1.info)(`pr ${pr.number} 显示不需要纳入 changelog`);
-                return;
-            }
-            if (pr.body.includes('### 📝 更新日志')) {
-                const reg = /-\s([A-Z]+)\(([A-Z]+)\):\s(.+)/gi;
-                const arr = [...pr.body.matchAll(reg)];
-                if (arr.length === 0) {
-                    (0, core_1.info)(`没有找到任何一条日志内容 number:${pr.number}, body:${pr.body}`);
-                    categories.extra.push(pr);
-                    return;
+            arr.map(a => regToPrObj(a)).forEach((changelog) => {
+                const logItem = Object.assign(Object.assign({}, pr), { changelog });
+                function isInLabel(label) {
+                    return label.includes(changelog.cate) || (arr.length === 1 && pr.labels.some(l => label.includes(l.name)));
                 }
-                arr.map(a => Renderer.regToPrObj(a)).forEach((changelog) => {
-                    const logItem = Object.assign(Object.assign({}, pr), { changelog });
-                    function isInLabel(label) {
-                        return label.includes(changelog.cate) || (arr.length === 1 && pr.labels.some(l => label.includes(l.name)));
-                    }
-                    if (isInLabel(breakingLabel)) {
-                        categories.breaking.push(logItem);
-                    }
-                    else if (isInLabel(featureLabel)) {
-                        categories.features.push(logItem);
-                    }
-                    else if (isInLabel(fixLabel)) {
-                        categories.bugfix.push(logItem);
-                    }
-                    else {
-                        categories.extra.push(logItem);
-                    }
-                });
-            }
-            else {
-                // 说明开发者没有按模版填写 pr，默认取 title
-                (0, core_1.info)(`pr ${pr.number} 没有填写模版`);
-                categories.extra.push(pr); // ??
-            }
-        });
-        return [
-            categories.breaking.length
-                ? `### ❗ Breaking Changes
-${Renderer.renderCate(categories.breaking)}`
-                : '',
-            categories.features.length
-                ? `### 🚀 Features
-${Renderer.renderCate(categories.features)}`
-                : '',
-            categories.bugfix.length
-                ? `### 🐞 Bug Fixes
-${Renderer.renderCate(categories.bugfix)}`
-                : '',
-            categories.extra.length
-                ? `### 🚧 Others
-${Renderer.renderCate(categories.extra)}`
-                : '',
-        ].filter(n => n).join('\n');
-    },
-};
-exports["default"] = Renderer;
+                if (isInLabel(breakingLabel)) {
+                    categories.breaking.push(logItem);
+                }
+                else if (isInLabel(featureLabel)) {
+                    categories.features.push(logItem);
+                }
+                else if (isInLabel(fixLabel)) {
+                    categories.bugfix.push(logItem);
+                }
+                else {
+                    categories.extra.push(logItem);
+                }
+            });
+        }
+        else {
+            // 说明开发者没有按模版填写 pr，默认取 title
+            (0, core_1.info)(`pr ${pr.number} 没有填写模版`);
+            categories.extra.push(pr); // ??
+        }
+    });
+    return [
+        categories.breaking.length
+            ? `### ❗ Breaking Changes
+${renderCate(categories.breaking)}`
+            : '',
+        categories.features.length
+            ? `### 🚀 Features
+${renderCate(categories.features)}`
+            : '',
+        categories.bugfix.length
+            ? `### 🐞 Bug Fixes
+${renderCate(categories.bugfix)}`
+            : '',
+        categories.extra.length
+            ? `### 🚧 Others
+${renderCate(categories.extra)}`
+            : '',
+    ].filter(n => n).join('\n');
+}
 
 
 /***/ }),

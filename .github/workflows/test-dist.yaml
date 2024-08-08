@@ -15,6 +15,8 @@ jobs:
         id: changelog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: 666.666.666.666
       - name: Add comment
         uses: peter-evans/create-or-update-comment@v4
         with:
