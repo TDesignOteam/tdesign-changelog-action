@@ -74,5 +74,11 @@ exports[`renderer > changelogReg 1`] = `
     "g",
     "a minor fix",
   ],
+  [
+    "- break(H H): a major update",
+    "break",
+    "H H",
+    "a major update",
+  ],
 ]
 `;
