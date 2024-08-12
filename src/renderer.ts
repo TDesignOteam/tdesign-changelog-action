@@ -5,7 +5,7 @@ const skipChangelogLabel = ['skip-changelog']
 const fixLabel = ['fix', 'bug', 'hotfix']
 const breakingLabel = ['break', 'breaking', 'breaking changes']
 const featureLabel = ['feature', 'feat', 'enhancement']
-
+export const ChangelogReg = /-\s([A-Z]+)(?:\(([A-Z]*)\))?:\s(.+)/gi
 export function getPReformatNotes(body: string) {
   const reg = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)\s/g
 
@@ -53,9 +53,7 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
     }
 
     if (pr.body.includes('### 📝 更新日志')) {
-      const reg = /-\s([A-Z]+)\(([A-Z]+)\):\s(.+)/gi
-
-      const arr = [...pr.body.matchAll(reg)]
+      const arr = [...pr.body.matchAll(ChangelogReg)]
 
       if (arr.length === 0) {
         info(`没有找到任何一条日志内容 number:${pr.number}, body:${pr.body}`)

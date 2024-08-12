@@ -1,0 +1,48 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`renderer > changelogReg 1`] = `
+[
+  [
+    "- A(A): a bug fix",
+    "A",
+    "A",
+    "a bug fix",
+  ],
+  [
+    "- B(B): a feature",
+    "B",
+    "B",
+    "a feature",
+  ],
+  [
+    "- C(C): a bug fix",
+    "C",
+    "C",
+    "a bug fix",
+  ],
+  [
+    "- D(D): a feature",
+    "D",
+    "D",
+    "a feature",
+  ],
+  [
+    "- E(): a bug fix",
+    "E",
+    "",
+    "a bug fix",
+  ],
+  [
+    "- F: a bug fix",
+    "F",
+    undefined,
+    "a bug fix",
+  ],
+  [
+    "- g(g): a minor fix",
+    "g",
+    "g",
+    "a minor fix",
+  ],
+]
+`;
