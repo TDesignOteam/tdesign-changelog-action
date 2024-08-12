@@ -5,6 +5,8 @@ import { changelog } from './fixtures/changelog'
 describe('renderer', () => {
   it('changelogReg', () => {
     const result = changelog.matchAll(ChangelogReg)
-    expect([...result]).toMatchSnapshot()
+    const arr = [...result]
+    expect(arr.length).toBe(13)
+    expect(arr).toMatchSnapshot()
   })
 })
