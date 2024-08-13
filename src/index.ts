@@ -37,7 +37,7 @@ async function generatorLogStart() {
     target_commitish: 'develop', // 也可以从上下文中拿
   })
   startGroup('releaseNodes')
-  info(`releaseNodes:${JSON.stringify(context, null, 4)}`)
+  info(`releaseNodes:${JSON.stringify(releaseNodes, null, 4)}`)
   endGroup()
   const PRNumbers = getPReformatNotes(releaseNodes.data.body)
 

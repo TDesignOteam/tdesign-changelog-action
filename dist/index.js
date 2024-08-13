@@ -29245,7 +29245,7 @@ function generatorLogStart() {
             target_commitish: 'develop', // 也可以从上下文中拿
         });
         (0, core_1.startGroup)('releaseNodes');
-        (0, core_1.info)(`releaseNodes:${JSON.stringify(github_1.context, null, 4)}`);
+        (0, core_1.info)(`releaseNodes:${JSON.stringify(releaseNodes, null, 4)}`);
         (0, core_1.endGroup)();
         const PRNumbers = (0, renderer_1.getPReformatNotes)(releaseNodes.data.body);
         const PRListRes = yield Promise.all(PRNumbers.map(pull_number => octokit.rest.pulls.get({
