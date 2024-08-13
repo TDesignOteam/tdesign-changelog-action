@@ -29220,7 +29220,9 @@ const github_1 = __nccwpck_require__(5942);
 const dayjs_1 = __importDefault(__nccwpck_require__(9090));
 const renderer_1 = __nccwpck_require__(5656);
 const GITHUB_TOKEN = node_process_1.default.env.GITHUB_TOKEN;
-(0, core_1.info)(`github.context:${JSON.stringify(github_1.context)}`);
+(0, core_1.startGroup)('github.context');
+(0, core_1.info)(`github.context:${JSON.stringify(github_1.context, null, 4)}`);
+(0, core_1.endGroup)();
 // console.log('payload', context.payload);
 if (!GITHUB_TOKEN) {
     throw new Error('GitHub\'s API requires a token. Please pass a valid token (GITHUB_TOKEN) as an env variable, no scopes are required.');
@@ -29235,20 +29237,26 @@ function generatorLogStart() {
         }
         const { owner, repo } = github_1.context.repo;
         (0, core_1.info)(`owner:${owner}, repo:${repo}`);
-        const releases = yield octokit.rest.repos.generateReleaseNotes({
+        // https://octokit.github.io/rest.js/v20#repos-generate-release-notes
+        const releaseNodes = yield octokit.rest.repos.generateReleaseNotes({
             owner,
             repo,
             tag_name: tag, // 'package.version'
             target_commitish: 'develop', // 也可以从上下文中拿
         });
-        const PRNumbers = (0, renderer_1.getPReformatNotes)(releases.data.body);
+        (0, core_1.startGroup)('releaseNodes');
+        (0, core_1.info)(`releaseNodes:${JSON.stringify(github_1.context, null, 4)}`);
+        (0, core_1.endGroup)();
+        const PRNumbers = (0, renderer_1.getPReformatNotes)(releaseNodes.data.body);
         const PRListRes = yield Promise.all(PRNumbers.map(pull_number => octokit.rest.pulls.get({
             owner,
             repo,
             pull_number,
         })));
         const PRList = PRListRes.map(res => res.data);
-        (0, core_1.info)(`PRList:${JSON.stringify(PRList)}`);
+        (0, core_1.startGroup)('releaseNodes');
+        (0, core_1.info)(`PRList:${JSON.stringify(PRList, null, 4)}`);
+        (0, core_1.endGroup)();
         const logRelease = `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
 ## 🌈 ${tag} \`${(0, dayjs_1.default)().format('YYYY-MM-DD')}\` \n${(0, renderer_1.renderMarkdown)(PRList)}\n`;
         (0, core_1.info)(logRelease);

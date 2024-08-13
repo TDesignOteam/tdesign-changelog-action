@@ -1,14 +1,15 @@
 import fs from 'node:fs'
 import process from 'node:process'
-import { getInput, info, setFailed, setOutput } from '@actions/core'
+import { endGroup, getInput, info, setFailed, setOutput, startGroup } from '@actions/core'
 import { context, getOctokit } from '@actions/github'
 import dayjs from 'dayjs'
 import { getPReformatNotes, renderMarkdown } from './renderer'
 import type { PullsData } from './types'
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
-
-info(`github.context:${JSON.stringify(context)}`)
+startGroup('github.context')
+info(`github.context:${JSON.stringify(context, null, 4)}`)
+endGroup()
 
 // console.log('payload', context.payload);
 
@@ -28,15 +29,17 @@ async function generatorLogStart() {
   }
   const { owner, repo } = context.repo
   info(`owner:${owner}, repo:${repo}`)
-
-  const releases = await octokit.rest.repos.generateReleaseNotes({
+  // https://octokit.github.io/rest.js/v20#repos-generate-release-notes
+  const releaseNodes = await octokit.rest.repos.generateReleaseNotes({
     owner,
     repo,
     tag_name: tag, // 'package.version'
     target_commitish: 'develop', // 也可以从上下文中拿
   })
-
-  const PRNumbers = getPReformatNotes(releases.data.body)
+  startGroup('releaseNodes')
+  info(`releaseNodes:${JSON.stringify(context, null, 4)}`)
+  endGroup()
+  const PRNumbers = getPReformatNotes(releaseNodes.data.body)
 
   const PRListRes = await Promise.all(PRNumbers.map(pull_number => octokit.rest.pulls.get({
     owner,
@@ -45,8 +48,9 @@ async function generatorLogStart() {
   })))
 
   const PRList = PRListRes.map(res => res.data as PullsData)
-
-  info(`PRList:${JSON.stringify(PRList)}`)
+  startGroup('releaseNodes')
+  info(`PRList:${JSON.stringify(PRList, null, 4)}`)
+  endGroup()
 
   const logRelease = `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
 ## 🌈 ${tag} \`${dayjs().format('YYYY-MM-DD')}\` \n${renderMarkdown(PRList)}\n`
