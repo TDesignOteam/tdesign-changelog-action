@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`renderer > changelogReg 1`] = `
+exports[`renderer > : changelogReg 1`] = `
 [
   [
     "- fix(A): a bug fix",
@@ -80,5 +80,24 @@ exports[`renderer > changelogReg 1`] = `
     "H H",
     "a major update",
   ],
+]
+`;
+
+exports[`renderer > : getPullNumber 1`] = `
+[
+  7,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  23,
+  25,
+  26,
+  27,
+  28,
 ]
 `;

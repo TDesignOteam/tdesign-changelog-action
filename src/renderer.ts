@@ -6,10 +6,9 @@ const fixLabel = ['fix', 'bug', 'hotfix']
 const breakingLabel = ['break', 'breaking', 'breaking changes']
 const featureLabel = ['feature', 'feat', 'enhancement']
 export const ChangelogReg = /-\s([A-Z]+)(?:\(([A-Z\s]*)\))?:\s(.+)/gi
-export function getPReformatNotes(body: string) {
-  const reg = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)\s/g
-
-  const arr = [...body.matchAll(reg)]
+export const PullNumberReg = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)\s/g
+export function getPullNumbers(body: string) {
+  const arr = [...body.matchAll(PullNumberReg)]
 
   return arr.map(n => Number(n[1])) // pr number list
 }

@@ -3,7 +3,7 @@ import process from 'node:process'
 import { getInput, info, setFailed, setOutput } from '@actions/core'
 import { context, getOctokit } from '@actions/github'
 import dayjs from 'dayjs'
-import { getPReformatNotes, renderMarkdown } from './renderer'
+import { getPullNumbers, renderMarkdown } from './renderer'
 import type { PullsData } from './types'
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
@@ -36,7 +36,7 @@ async function generatorLogStart() {
     target_commitish: 'develop', // 也可以从上下文中拿
   })
 
-  const PRNumbers = getPReformatNotes(releases.data.body)
+  const PRNumbers = getPullNumbers(releases.data.body)
 
   const PRListRes = await Promise.all(PRNumbers.map(pull_number => octokit.rest.pulls.get({
     owner,
