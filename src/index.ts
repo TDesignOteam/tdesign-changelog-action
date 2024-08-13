@@ -48,7 +48,7 @@ async function generatorLogStart() {
   })))
 
   const PRList = PRListRes.map(res => res.data as PullsData)
-  startGroup('releaseNodes')
+  startGroup('PRList')
   info(`PRList:${JSON.stringify(PRList, null, 4)}`)
   endGroup()
 

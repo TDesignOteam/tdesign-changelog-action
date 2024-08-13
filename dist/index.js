@@ -29254,7 +29254,7 @@ function generatorLogStart() {
             pull_number,
         })));
         const PRList = PRListRes.map(res => res.data);
-        (0, core_1.startGroup)('releaseNodes');
+        (0, core_1.startGroup)('PRList');
         (0, core_1.info)(`PRList:${JSON.stringify(PRList, null, 4)}`);
         (0, core_1.endGroup)();
         const logRelease = `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
