@@ -7,6 +7,7 @@ const breakingLabel = ['break', 'breaking', 'breaking changes']
 const featureLabel = ['feature', 'feat', 'enhancement']
 export const CHANGELOG_REG = /-\s([A-Z]+)(?:\(([A-Z\s]*)\))?:\s(.+)/gi
 export const PULL_NUMBER_REG = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)\s/g
+export const SKIP_CHANGELOG_REG = /\[x\] 本条 PR 不需要纳入 changelog/i
 export function getPullNumbers(body: string) {
   const arr = [...body.matchAll(PULL_NUMBER_REG)]
 
@@ -46,7 +47,7 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
       return
     }
     // 在 pr body 明确填了 跳过 label
-    if (/\[x\] 本条 PR 不需要纳入 changelog/i.test(pr.body)) {
+    if (SKIP_CHANGELOG_REG.test(pr.body)) {
       info(`pr ${pr.number} 显示不需要纳入 changelog`)
       return
     }
