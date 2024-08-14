@@ -1,4 +1,4 @@
-export const changelog = `
+const changelog = `
 - fix(A): a bug fix
 - hotfix(A): a bug fix
 - bug(A): a bug fix
@@ -13,3 +13,4 @@ export const changelog = `
 - break(g): a minor fix
 - break(H H): a major update
 `
+export default changelog

@@ -1,4 +1,4 @@
-const body = `
+const releaseNotes = `
 ## What's Changed
 * feat: get latest tag by @liweijie0812 in https://github.com/TDesignOteam/tdesign-changelog-action/pull/7
 * ci: tdesign-tag-action by @liweijie0812 in https://github.com/TDesignOteam/tdesign-changelog-action/pull/14
@@ -18,7 +18,4 @@ const body = `
 
 **Full Changelog**: https://github.com/TDesignOteam/tdesign-changelog-action/compare/0.0.1...0.2.0
 `
-export const releaseNotes = {
-  name: '0.2.0',
-  body,
-}
+export default releaseNotes
