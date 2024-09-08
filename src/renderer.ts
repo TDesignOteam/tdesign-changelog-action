@@ -10,8 +10,9 @@ export const PULL_NUMBER_REG = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)/g
 export const SKIP_CHANGELOG_REG = /\[x\] 本条 PR 不需要纳入 changelog/i
 export function getPullNumbers(body: string) {
   const arr = [...body.matchAll(PULL_NUMBER_REG)]
-
-  return arr.map(n => Number(n[1])) // pr number list
+  const pullNumbers = arr.map(n => Number(n[1])) // pr number list
+  const uniquePullNumbers = [...new Set(pullNumbers)]
+  return uniquePullNumbers
 }
 
 function regToPrObj(arr: string[]) {
