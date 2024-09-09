@@ -18,7 +18,7 @@ exports[`generatorLog > : generatorLogStart 1`] = `
 - \`A\`: a bug fix label in hotfix @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
 - \`A\`: a bug fix label in bug @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
 ### 🚧 Others
-- \`\`: a doc change label in docs @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
-- \`\`: a chore label in chore @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`docs\`: a doc change label in docs @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`chore\`: a chore label in chore @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
 "
 `;
