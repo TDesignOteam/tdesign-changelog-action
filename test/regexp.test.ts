@@ -7,7 +7,7 @@ describe('regexp', () => {
   it(': CHANGELOG_REG', () => {
     const result = changelog.matchAll(CHANGELOG_REG)
     const arr = [...result]
-    expect(arr.length).toBe(13)
+    expect(arr.length).toBe(14)
     expect(arr).toMatchSnapshot()
   })
 

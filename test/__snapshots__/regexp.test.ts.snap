@@ -80,6 +80,12 @@ exports[`regexp > : CHANGELOG_REG 1`] = `
     "H H",
     "a major update label in break",
   ],
+  [
+    "- refactor(I): a refactor label in refactor",
+    "refactor",
+    "I",
+    "a refactor label in refactor",
+  ],
 ]
 `;
 

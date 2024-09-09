@@ -12,6 +12,7 @@ export const changelog = `
 - chore: a chore label in chore
 - break(g): a minor fix label in break
 - break(H H): a major update label in break
+- refactor(I): a refactor label in refactor
 `
 
 export default changelog
