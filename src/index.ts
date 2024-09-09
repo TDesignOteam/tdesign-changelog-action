@@ -1,5 +1,5 @@
 import process from 'node:process'
-import { getInput, info, setFailed, setOutput } from '@actions/core'
+import { info, setFailed } from '@actions/core'
 import { context } from '@actions/github'
 import { generatorLogStart } from './generator'
 
