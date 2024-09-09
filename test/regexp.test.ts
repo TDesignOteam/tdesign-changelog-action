@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { CHANGELOG_REG, PULL_NUMBER_REG, SKIP_CHANGELOG_REG } from '../src/renderer'
 import changelog from './fixtures/changelog'
-import releaseNotes from './fixtures/releaseNotes'
+import releaseNotes from './fixtures/release-notes'
 
 describe('regexp', () => {
   it(': CHANGELOG_REG', () => {
@@ -14,7 +14,7 @@ describe('regexp', () => {
   it(': PULL_NUMBER_REG', () => {
     const result = releaseNotes.matchAll(PULL_NUMBER_REG)
     const arr = [...result]
-    expect(arr.length).toBe(14)
+    expect(arr.length).toBe(6)
     expect(arr).toMatchSnapshot()
   })
 

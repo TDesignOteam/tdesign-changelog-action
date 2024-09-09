@@ -3,82 +3,82 @@
 exports[`regexp > : CHANGELOG_REG 1`] = `
 [
   [
-    "- fix(A): a bug fix",
+    "- fix(A): a bug fix label in fix",
     "fix",
     "A",
-    "a bug fix",
+    "a bug fix label in fix",
   ],
   [
-    "- hotfix(A): a bug fix",
+    "- hotfix(A): a bug fix label in hotfix",
     "hotfix",
     "A",
-    "a bug fix",
+    "a bug fix label in hotfix",
   ],
   [
-    "- bug(A): a bug fix",
+    "- bug(A): a bug fix label in bug",
     "bug",
     "A",
-    "a bug fix",
+    "a bug fix label in bug",
   ],
   [
-    "- feat(B): a feature",
+    "- feat(B): a feature label in feat",
     "feat",
     "B",
-    "a feature",
+    "a feature label in feat",
   ],
   [
-    "- feature(B): a feature",
+    "- feature(B): a feature label in feature",
     "feature",
     "B",
-    "a feature",
+    "a feature label in feature",
   ],
   [
-    "- enhancement(B): a feature",
+    "- enhancement(B): a feature label in enhancement",
     "enhancement",
     "B",
-    "a feature",
+    "a feature label in enhancement",
   ],
   [
-    "- break(C): a major update",
+    "- break(C): a major update label in break",
     "break",
     "C",
-    "a major update",
+    "a major update label in break",
   ],
   [
-    "- breaking(C): a major update",
+    "- breaking(C): a major update label in breaking",
     "breaking",
     "C",
-    "a major update",
+    "a major update label in breaking",
   ],
   [
-    "- feat(D): a feature",
+    "- feat(D): a feature  label in feat",
     "feat",
     "D",
-    "a feature",
+    "a feature  label in feat",
   ],
   [
-    "- docs(): a doc change",
+    "- docs(): a doc change label in docs",
     "docs",
     "",
-    "a doc change",
+    "a doc change label in docs",
   ],
   [
-    "- chore: a chore",
+    "- chore: a chore label in chore",
     "chore",
     undefined,
-    "a chore",
+    "a chore label in chore",
   ],
   [
-    "- break(g): a minor fix",
+    "- break(g): a minor fix label in break",
     "break",
     "g",
-    "a minor fix",
+    "a minor fix label in break",
   ],
   [
-    "- break(H H): a major update",
+    "- break(H H): a major update label in break",
     "break",
     "H H",
-    "a major update",
+    "a major update label in break",
   ],
 ]
 `;
@@ -86,60 +86,28 @@ exports[`regexp > : CHANGELOG_REG 1`] = `
 exports[`regexp > : PULL_NUMBER_REG 1`] = `
 [
   [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/7",
-    "7",
+    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/1",
+    "1",
   ],
   [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/14",
-    "14",
+    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/2",
+    "2",
   ],
   [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/15",
-    "15",
+    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/3",
+    "3",
   ],
   [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/16",
-    "16",
+    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/4",
+    "4",
   ],
   [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/17",
-    "17",
+    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/5",
+    "5",
   ],
   [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/18",
-    "18",
-  ],
-  [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/19",
-    "19",
-  ],
-  [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/20",
-    "20",
-  ],
-  [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/21",
-    "21",
-  ],
-  [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/23",
-    "23",
-  ],
-  [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/25",
-    "25",
-  ],
-  [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/26",
-    "26",
-  ],
-  [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/27",
-    "27",
-  ],
-  [
-    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/28",
-    "28",
+    "in https://github.com/TDesignOteam/tdesign-changelog-action/pull/1",
+    "1",
   ],
 ]
 `;

@@ -1,16 +1,17 @@
-const changelog = `
-- fix(A): a bug fix
-- hotfix(A): a bug fix
-- bug(A): a bug fix
-- feat(B): a feature
-- feature(B): a feature
-- enhancement(B): a feature
-- break(C): a major update
-- breaking(C): a major update
-- feat(D): a feature
-- docs(): a doc change
-- chore: a chore
-- break(g): a minor fix
-- break(H H): a major update
+export const changelog = `
+- fix(A): a bug fix label in fix
+- hotfix(A): a bug fix label in hotfix
+- bug(A): a bug fix label in bug
+- feat(B): a feature label in feat
+- feature(B): a feature label in feature
+- enhancement(B): a feature label in enhancement
+- break(C): a major update label in break
+- breaking(C): a major update label in breaking
+- feat(D): a feature  label in feat
+- docs(): a doc change label in docs
+- chore: a chore label in chore
+- break(g): a minor fix label in break
+- break(H H): a major update label in break
 `
+
 export default changelog

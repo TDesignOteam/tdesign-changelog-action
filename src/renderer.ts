@@ -18,7 +18,7 @@ export function getPullNumbers(body: string) {
 function regToPrObj(arr: string[]) {
   return {
     cate: arr[1],
-    component: arr[2],
+    component: arr[2] || '',
     desc: arr[3],
   }
 }

@@ -3,5 +3,6 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     // ...
+    setupFiles: ['./test/setup-env.ts', './test/setup-github.ts', './test/setup-octokit.ts'],
   },
 })

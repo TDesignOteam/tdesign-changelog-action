@@ -1,0 +1,24 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`generatorLog > : generatorLogStart 1`] = `
+"(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
+  ## 🌈 0.2.0 \`2024-02-24\` 
+### ❗ Breaking Changes
+- \`C\`: a major update label in break @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`C\`: a major update label in breaking @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`g\`: a minor fix label in break @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`H H\`: a major update label in break @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+### 🚀 Features
+- \`B\`: a feature label in feat @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`B\`: a feature label in feature @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`B\`: a feature label in enhancement @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`D\`: a feature  label in feat @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+### 🐞 Bug Fixes
+- \`A\`: a bug fix label in fix @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`A\`: a bug fix label in hotfix @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`A\`: a bug fix label in bug @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+### 🚧 Others
+- \`\`: a doc change label in docs @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`\`: a chore label in chore @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+"
+`;
