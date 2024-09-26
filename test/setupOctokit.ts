@@ -304,7 +304,7 @@ const pullRequestData = {
     },
   },
 }
-vi.mock('../src/use-octokit', () => {
+vi.mock('../src/useOctokit', () => {
   return {
     useOctokit: () => ({
       generateReleaseNotes: () => Promise.resolve(releaseNotesData),

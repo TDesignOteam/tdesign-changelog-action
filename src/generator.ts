@@ -4,7 +4,7 @@ import { getInput, info, setOutput } from '@actions/core'
 import dayjs from 'dayjs'
 import { getPullNumbers, renderMarkdown } from './renderer'
 import type { PullsData } from './types'
-import { useOctokit } from './use-octokit'
+import { useOctokit } from './useOctokit'
 
 export async function generatorLogStart(context) {
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ''
