@@ -17,10 +17,11 @@ exports[`generatorLog > : generatorLogStart 1`] = `
 - \`A\`: a bug fix label in fix @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
 - \`A\`: a bug fix label in hotfix @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
 - \`A\`: a bug fix label in bug @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+### 📈 Performance
+- \`I\`: a refactor label in refactor @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
 ### 📝 Documentation
 - \`docs\`: a doc change label in docs @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
 ### 🚧 Others
 - \`chore\`: a chore label in chore @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
-- \`I\`: a refactor label in refactor @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
 "
 `;
