@@ -5,6 +5,7 @@ const skipChangelogLabel = ['skip-changelog']
 const fixLabel = ['fix', 'bug', 'hotfix']
 const breakingLabel = ['break', 'breaking', 'breaking changes']
 const featureLabel = ['feature', 'feat', 'enhancement']
+const docsLabel = ['docs', 'doc', 'documentation']
 export const CHANGELOG_REG = /-\s([A-Z]+)(?:\(([A-Z\s]*)\))?:\s(.+)/gi
 export const PULL_NUMBER_REG = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)/g
 export const SKIP_CHANGELOG_REG = /\[x\] 本条 PR 不需要纳入 changelog/i
@@ -36,6 +37,7 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
     breaking: [] as PRChangelog[],
     features: [] as PRChangelog[],
     bugfix: [] as PRChangelog[],
+    docs: [] as PRChangelog[],
     extra: [] as PRChangelog[],
   }
 
@@ -81,6 +83,9 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
         else if (isInLabel(fixLabel)) {
           categories.bugfix.push(logItem)
         }
+        else if (isInLabel(docsLabel)) {
+          categories.docs.push(logItem)
+        }
         else {
           categories.extra.push(logItem)
         }
@@ -94,24 +99,10 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
   })
 
   return [
-    categories.breaking.length
-      ? `### ❗ Breaking Changes
-${renderCate(categories.breaking)}`
-      : '',
-
-    categories.features.length
-      ? `### 🚀 Features
-${renderCate(categories.features)}`
-      : '',
-
-    categories.bugfix.length
-      ? `### 🐞 Bug Fixes
-${renderCate(categories.bugfix)}`
-      : '',
-
-    categories.extra.length
-      ? `### 🚧 Others
-${renderCate(categories.extra)}`
-      : '',
+    categories.breaking.length ? `### ❗ Breaking Changes\n${renderCate(categories.breaking)}` : '',
+    categories.features.length ? `### 🚀 Features\n${renderCate(categories.features)}` : '',
+    categories.bugfix.length ? `### 🐞 Bug Fixes\n${renderCate(categories.bugfix)}` : '',
+    categories.docs.length ? `### 📝 Documentation\n${renderCate(categories.docs)}` : '',
+    categories.extra.length ? `### 🚧 Others\n${renderCate(categories.extra)}` : '',
   ].filter(n => n).join('\n')
 }
