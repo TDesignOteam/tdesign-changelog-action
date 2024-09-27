@@ -1,4 +1,4 @@
-import fs from 'node:fs'
+import { readFileSync } from 'node:fs'
 import process from 'node:process'
 import { getInput, info, setOutput } from '@actions/core'
 import dayjs from 'dayjs'
@@ -11,7 +11,7 @@ export async function generatorLogStart(context) {
   const { generateReleaseNotes, getPullRequest } = useOctokit({ token: GITHUB_TOKEN })
   let tag = getInput('tag', { required: false })
   if (!tag) {
-    const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
+    const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
     tag = pkg.version
   }
   const { owner, repo } = context.repo
