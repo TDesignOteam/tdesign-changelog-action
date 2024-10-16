@@ -1,9 +1,9 @@
+import type { PullsData } from './types'
 import { readFileSync } from 'node:fs'
 import process from 'node:process'
 import { getInput, info, setOutput } from '@actions/core'
 import dayjs from 'dayjs'
 import { getPullNumbers, renderMarkdown } from './renderer'
-import type { PullsData } from './types'
 import { useOctokit } from './useOctokit'
 
 export async function generatorLogStart(context) {

@@ -1,4 +1,5 @@
 ## generator log
+
 ```
 # 1. 监听 release分支到develop的pr ，拉取当前 ref 和上一个 tag 的ref 的compare中的所有pr
 # 2. 提取 pr list 的所有 body 的 更新日志
