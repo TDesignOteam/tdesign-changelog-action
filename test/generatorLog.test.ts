@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
 import { context } from '@actions/github'
+import { describe, expect, it, vi } from 'vitest'
 import { generatorLogStart } from '../src/generator'
 
 vi.mock('node:fs', async () => {

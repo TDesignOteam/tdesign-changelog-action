@@ -1,5 +1,5 @@
-import { info } from '@actions/core'
 import type { PRChangelog, PullsData } from './types'
+import { info } from '@actions/core'
 
 const skipChangelogLabel = ['skip-changelog']
 const fixLabel = ['fix', 'bug', 'hotfix']
@@ -27,9 +27,9 @@ function regToPrObj(arr: string[]) {
 }
 function renderCate(cate: PRChangelog[]) {
   return `${cate.sort().map((pr) => {
-          const title = pr.changelog ? `\`${pr.changelog.component || pr.changelog.cate}\`: ${pr.changelog.desc}` : pr.title
-          return `- ${title} @${pr.user.login} ([#${pr.number}](${pr.html_url}))`
-      }).join('\n')}`
+    const title = pr.changelog ? `\`${pr.changelog.component || pr.changelog.cate}\`: ${pr.changelog.desc}` : pr.title
+    return `- ${title} @${pr.user.login} ([#${pr.number}](${pr.html_url}))`
+  }).join('\n')}`
 }
 
 export function renderMarkdown(pullRequestList: PullsData[]) {
