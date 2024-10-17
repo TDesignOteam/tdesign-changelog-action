@@ -98,6 +98,18 @@ exports[`regexp > : CHANGELOG_REG 1`] = `
     undefined,
     "test label in test",
   ],
+  [
+    "- fix(CHANGELOG_REG): 修复日志冒号前面有空格正则匹配不到",
+    "fix",
+    "CHANGELOG_REG",
+    "修复日志冒号前面有空格正则匹配不到",
+  ],
+  [
+    "- fix(test-test): test-test",
+    "fix",
+    "test-test",
+    "test-test",
+  ],
 ]
 `;
 

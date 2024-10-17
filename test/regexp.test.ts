@@ -6,11 +6,11 @@ import releaseNotes from './fixtures/release-notes'
 describe('regexp', () => {
   it(': CHANGELOG_REG', () => {
     const records = changelog.matchAll(/-\s/g)
-    expect([...records].length).toBe(16)
+    expect([...records].length).toBe(18)
 
     const result = changelog.matchAll(CHANGELOG_REG)
     const arr = [...result]
-    expect(arr.length).toBe(16)
+    expect(arr.length).toBe(18)
     expect(arr).toMatchSnapshot()
   })
 
