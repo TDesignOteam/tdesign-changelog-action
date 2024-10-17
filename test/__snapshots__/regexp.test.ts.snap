@@ -86,6 +86,18 @@ exports[`regexp > : CHANGELOG_REG 1`] = `
     "I",
     "a refactor label in refactor",
   ],
+  [
+    "- test(J) : test label in test",
+    "test",
+    "J",
+    "test label in test",
+  ],
+  [
+    "- test : test label in test",
+    "test",
+    undefined,
+    "test label in test",
+  ],
 ]
 `;
 
