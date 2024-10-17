@@ -30012,7 +30012,7 @@ const breakingLabel = ['break', 'breaking', 'breaking changes'];
 const featureLabel = ['feature', 'feat', 'enhancement'];
 const docsLabel = ['docs', 'doc', 'documentation'];
 const refactorLabel = ['pref', 'refactor'];
-exports.CHANGELOG_REG = /-\s([A-Z]+)(?:\(([A-Z\s]*)\))?:\s(.+)/gi;
+exports.CHANGELOG_REG = /-\s([A-Z]+)(?:\(([A-Z\s]*)\))?\s*:\s(.+)/gi;
 exports.PULL_NUMBER_REG = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)/g;
 exports.SKIP_CHANGELOG_REG = /\[x\] 本条 PR 不需要纳入 changelog/i;
 function getPullNumbers(body) {
