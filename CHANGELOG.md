@@ -1,5 +1,14 @@
 
 
+## 🌈 0.3.0 `2024-10-17` 
+### 🚀 Features
+- `Log`: 新增 `📝 Documentation` 日志分类 @liweijie0812 ([#31](https://github.com/TDesignOteam/tdesign-changelog-action/pull/31))
+- `Log`: 新增 `📈 Performance` 日志分类 @liweijie0812 ([#31](https://github.com/TDesignOteam/tdesign-changelog-action/pull/31))
+### 🐞 Bug Fixes
+- `Log`: 修复多了`New Contributors` 列表提取的日志出现重复 @liweijie0812 ([#31](https://github.com/TDesignOteam/tdesign-changelog-action/pull/31))
+- `CHANGELOG_REG`: 修复日志冒号前面有空格正则匹配不到 @liweijie0812 ([#37](https://github.com/TDesignOteam/tdesign-changelog-action/pull/37))
+- `CHANGELOG_REG`: 修复日志分类内容`test_a`和`test-b`无法匹配 @liweijie0812 ([#38](https://github.com/TDesignOteam/tdesign-changelog-action/pull/38))
+
 ## 🌈 0.2.0 `2024-08-06` 
 ### 🚀 Features
 - `TS`: `js` 迁移 `ts` @liweijie0812 ([#26](https://github.com/TDesignOteam/tdesign-changelog-action/pull/26))
