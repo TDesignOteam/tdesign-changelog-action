@@ -13,6 +13,8 @@ export const changelog = `
 - break(g): a minor fix label in break
 - break(H H): a major update label in break
 - refactor(I): a refactor label in refactor
+- test(J) : test label in test
+- test : test label in test
 `
 
 export default changelog
