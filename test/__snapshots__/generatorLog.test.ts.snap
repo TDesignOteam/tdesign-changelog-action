@@ -23,5 +23,7 @@ exports[`generatorLog > : generatorLogStart 1`] = `
 - \`docs\`: a doc change label in docs @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
 ### 🚧 Others
 - \`chore\`: a chore label in chore @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`J\`: test label in test @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
+- \`test\`: test label in test @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
 "
 `;
