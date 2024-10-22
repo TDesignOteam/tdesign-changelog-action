@@ -7,20 +7,20 @@ on:
 
 jobs:
   generator:
-  if: startsWith(github.head_ref, 'release/') != true
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-    - name: changelog
-      uses: ./
-      id: changelog
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag: 666.666.666.666
-    - name: Add comment
-      uses: peter-evans/create-or-update-comment@v4
-      with:
-        issue-number: ${{ github.event.pull_request.number }}
-        body: |
-          ${{ steps.changelog.outputs.changelog }}
+    if: startsWith(github.head_ref, 'release/') != true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: changelog
+        uses: ./
+        id: changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: 666.666.666.666
+      - name: Add comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ${{ steps.changelog.outputs.changelog }}
