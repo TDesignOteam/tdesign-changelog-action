@@ -4,6 +4,8 @@ on:
     branches: [develop]
     paths:
       - dist/index.js
+  issue_comment:
+    types: [edited]
 
 jobs:
   generator:
