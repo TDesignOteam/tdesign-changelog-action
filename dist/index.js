@@ -30051,6 +30051,7 @@ function renderMarkdown(pullRequestList) {
         docs: [],
         extra: [],
     };
+    (0, core_1.startGroup)(`[renderer] pullRequestList`);
     pullRequestList.forEach((pr) => {
         pr.body = pr.body ? pr.body : '';
         // 不需要纳入 changelog 的 label
@@ -30101,6 +30102,7 @@ function renderMarkdown(pullRequestList) {
             categories.extra.push(pr); // ??
         }
     });
+    (0, core_1.endGroup)();
     return [
         categories.breaking.length ? `### ❗ Breaking Changes\n${renderCate(categories.breaking)}` : '',
         categories.features.length ? `### 🚀 Features\n${renderCate(categories.features)}` : '',
