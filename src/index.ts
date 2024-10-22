@@ -6,7 +6,10 @@ import { generatorLogStart } from './generator'
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 startGroup(`[base] github.context`)
 info(`context:${JSON.stringify(context)}`)
-info(`eventName:${context.payload.eventName}`)
+endGroup()
+
+startGroup(`[base] info`)
+info(`eventName:${context.eventName}`)
 info(`action:${context.payload.action}`)
 endGroup()
 
