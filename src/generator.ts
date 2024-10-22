@@ -1,7 +1,7 @@
 import type { PullsData } from './types'
 import { readFileSync } from 'node:fs'
 import process from 'node:process'
-import { getInput, info, setOutput } from '@actions/core'
+import { endGroup, getInput, info, setOutput, startGroup } from '@actions/core'
 import dayjs from 'dayjs'
 import { getPullNumbers, renderMarkdown } from './renderer'
 import { useOctokit } from './useOctokit'
@@ -33,8 +33,10 @@ export async function generatorLogStart(context) {
   )))
 
   const PRList = PRListRes.map(res => res.data as PullsData)
-
-  info(`PRList:${JSON.stringify(PRList)}`)
+  startGroup(`[generator] PRList`)
+  info(`PRList count:${PRList.length}`)
+  info(`PRList json:${JSON.stringify(PRList)}`)
+  endGroup()
 
   const logRelease = `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
 ## 🌈 ${tag} \`${dayjs().format('YYYY-MM-DD')}\` \n${renderMarkdown(PRList)}\n`

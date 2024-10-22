@@ -29954,7 +29954,10 @@ function generatorLogStart(context) {
         const PRNumbers = (0, renderer_1.getPullNumbers)(releases.data.body);
         const PRListRes = yield Promise.all(PRNumbers.map(pull_number => getPullRequest(owner, repo, pull_number)));
         const PRList = PRListRes.map(res => res.data);
-        (0, core_1.info)(`PRList:${JSON.stringify(PRList)}`);
+        (0, core_1.startGroup)(`[generator] PRList`);
+        (0, core_1.info)(`PRList count:${PRList.length}`);
+        (0, core_1.info)(`PRList json:${JSON.stringify(PRList)}`);
+        (0, core_1.endGroup)();
         const logRelease = `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
 ## 🌈 ${tag} \`${(0, dayjs_1.default)().format('YYYY-MM-DD')}\` \n${(0, renderer_1.renderMarkdown)(PRList)}\n`;
         (0, core_1.info)(logRelease);
