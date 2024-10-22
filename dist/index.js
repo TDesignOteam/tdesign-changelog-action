@@ -29983,7 +29983,11 @@ const core_1 = __nccwpck_require__(4708);
 const github_1 = __nccwpck_require__(3802);
 const generator_1 = __nccwpck_require__(2965);
 const GITHUB_TOKEN = node_process_1.default.env.GITHUB_TOKEN;
-(0, core_1.info)(`github.context:${JSON.stringify(github_1.context)}`);
+(0, core_1.startGroup)(`[base] github.context`);
+(0, core_1.info)(`context:${JSON.stringify(github_1.context)}`);
+(0, core_1.info)(`eventName:${github_1.context.payload.eventName}`);
+(0, core_1.info)(`action:${github_1.context.payload.action}`);
+(0, core_1.endGroup)();
 // console.log('payload', context.payload);
 if (!GITHUB_TOKEN) {
     throw new Error('GitHub\'s API requires a token. Please pass a valid token (GITHUB_TOKEN) as an env variable, no scopes are required.');

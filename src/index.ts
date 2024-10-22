@@ -1,10 +1,14 @@
 import process from 'node:process'
-import { info, setFailed } from '@actions/core'
+import { endGroup, info, setFailed, startGroup } from '@actions/core'
 import { context } from '@actions/github'
 import { generatorLogStart } from './generator'
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
-info(`github.context:${JSON.stringify(context)}`)
+startGroup(`[base] github.context`)
+info(`context:${JSON.stringify(context)}`)
+info(`eventName:${context.payload.eventName}`)
+info(`action:${context.payload.action}`)
+endGroup()
 
 // console.log('payload', context.payload);
 
