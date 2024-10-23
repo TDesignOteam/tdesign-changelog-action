@@ -4,9 +4,12 @@ on:
     branches: [develop]
     paths:
       - dist/index.js
+  issue_comment:
+    types: [edited]
 
 jobs:
   generator:
+    if: ${{ !startsWith(github.head_ref, 'release/') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

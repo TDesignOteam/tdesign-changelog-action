@@ -29954,7 +29954,10 @@ function generatorLogStart(context) {
         const PRNumbers = (0, renderer_1.getPullNumbers)(releases.data.body);
         const PRListRes = yield Promise.all(PRNumbers.map(pull_number => getPullRequest(owner, repo, pull_number)));
         const PRList = PRListRes.map(res => res.data);
-        (0, core_1.info)(`PRList:${JSON.stringify(PRList)}`);
+        (0, core_1.startGroup)(`[generator] PRList`);
+        (0, core_1.info)(`PRList count:${PRList.length}`);
+        (0, core_1.info)(`PRList json:${JSON.stringify(PRList)}`);
+        (0, core_1.endGroup)();
         const logRelease = `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
 ## 🌈 ${tag} \`${(0, dayjs_1.default)().format('YYYY-MM-DD')}\` \n${(0, renderer_1.renderMarkdown)(PRList)}\n`;
         (0, core_1.info)(logRelease);
@@ -29983,7 +29986,13 @@ const core_1 = __nccwpck_require__(4708);
 const github_1 = __nccwpck_require__(3802);
 const generator_1 = __nccwpck_require__(2965);
 const GITHUB_TOKEN = node_process_1.default.env.GITHUB_TOKEN;
-(0, core_1.info)(`github.context:${JSON.stringify(github_1.context)}`);
+(0, core_1.startGroup)(`[base] github.context`);
+(0, core_1.info)(`context:${JSON.stringify(github_1.context)}`);
+(0, core_1.endGroup)();
+(0, core_1.startGroup)(`[base] info`);
+(0, core_1.info)(`eventName:${github_1.context.eventName}`);
+(0, core_1.info)(`action:${github_1.context.payload.action}`);
+(0, core_1.endGroup)();
 // console.log('payload', context.payload);
 if (!GITHUB_TOKEN) {
     throw new Error('GitHub\'s API requires a token. Please pass a valid token (GITHUB_TOKEN) as an env variable, no scopes are required.');
@@ -30045,6 +30054,7 @@ function renderMarkdown(pullRequestList) {
         docs: [],
         extra: [],
     };
+    (0, core_1.startGroup)(`[renderer] pullRequestList`);
     pullRequestList.forEach((pr) => {
         pr.body = pr.body ? pr.body : '';
         // 不需要纳入 changelog 的 label
@@ -30095,6 +30105,7 @@ function renderMarkdown(pullRequestList) {
             categories.extra.push(pr); // ??
         }
     });
+    (0, core_1.endGroup)();
     return [
         categories.breaking.length ? `### ❗ Breaking Changes\n${renderCate(categories.breaking)}` : '',
         categories.features.length ? `### 🚀 Features\n${renderCate(categories.features)}` : '',

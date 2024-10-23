@@ -1,5 +1,5 @@
 import type { PRChangelog, PullsData } from './types'
-import { info } from '@actions/core'
+import { endGroup, info, startGroup } from '@actions/core'
 
 const skipChangelogLabel = ['skip-changelog']
 const fixLabel = ['fix', 'bug', 'hotfix']
@@ -43,7 +43,7 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
     docs: [] as PRChangelog[],
     extra: [] as PRChangelog[],
   }
-
+  startGroup(`[renderer] pullRequestList`)
   pullRequestList.forEach((pr) => {
     pr.body = pr.body ? pr.body : ''
 
@@ -103,6 +103,7 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
       categories.extra.push(pr) // ??
     }
   })
+  endGroup()
 
   return [
     categories.breaking.length ? `### ❗ Breaking Changes\n${renderCate(categories.breaking)}` : '',
