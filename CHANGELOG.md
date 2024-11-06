@@ -1,5 +1,9 @@
 
 
+## 🌈 0.4.0 `2024-11-06` 
+### 🚀 Features
+- `Log`: 日志提取跳过用户类型为`Bot`的 PR @liweijie0812 ([#42](https://github.com/TDesignOteam/tdesign-changelog-action/pull/42))
+
 ## 🌈 0.3.0 `2024-10-17` 
 ### 🚀 Features
 - `Log`: 新增 `📝 Documentation` 日志分类 @liweijie0812 ([#31](https://github.com/TDesignOteam/tdesign-changelog-action/pull/31))
