@@ -46,8 +46,9 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
   startGroup(`[renderer] pullRequestList`)
   pullRequestList.forEach((pr) => {
     pr.body = pr.body ? pr.body : ''
-    // 跳过机器人PR
+    // pr 用户类型是 Bot 不纳入 Changelog
     if (pr.user.type === 'Bot') {
+      info(`pr ${pr.number} 用户类型是 Bot 不纳入 Changelog`)
       return
     }
     // 不需要纳入 changelog 的 label
@@ -57,7 +58,7 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
     }
     // 在 pr body 明确填了 跳过 label
     if (SKIP_CHANGELOG_REG.test(pr.body)) {
-      info(`pr ${pr.number} 显示不需要纳入 changelog`)
+      info(`pr ${pr.number} 显示不需要纳入 Changelog`)
       return
     }
 

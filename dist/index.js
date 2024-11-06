@@ -30057,8 +30057,9 @@ function renderMarkdown(pullRequestList) {
     (0, core_1.startGroup)(`[renderer] pullRequestList`);
     pullRequestList.forEach((pr) => {
         pr.body = pr.body ? pr.body : '';
-        // 跳过机器人PR
+        // pr 用户类型是 Bot 不纳入 Changelog
         if (pr.user.type === 'Bot') {
+            (0, core_1.info)(`pr ${pr.number} 用户类型是 Bot 不纳入 Changelog`);
             return;
         }
         // 不需要纳入 changelog 的 label
@@ -30068,7 +30069,7 @@ function renderMarkdown(pullRequestList) {
         }
         // 在 pr body 明确填了 跳过 label
         if (exports.SKIP_CHANGELOG_REG.test(pr.body)) {
-            (0, core_1.info)(`pr ${pr.number} 显示不需要纳入 changelog`);
+            (0, core_1.info)(`pr ${pr.number} 显示不需要纳入 Changelog`);
             return;
         }
         if (pr.body.includes('### 📝 更新日志')) {

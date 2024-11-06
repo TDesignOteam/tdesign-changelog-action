@@ -1,11 +1,9 @@
-name: test dist
+name: TEST_ACTION
 on:
   pull_request:
     branches: [develop]
     paths:
       - dist/index.js
-  issue_comment:
-    types: [edited]
 
 jobs:
   generator:
