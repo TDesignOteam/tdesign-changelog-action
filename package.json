@@ -1,6 +1,6 @@
 {
   "name": "tdesign-changelog-action",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "packageManager": "pnpm@9.12.1",
   "description": "自动生成 pr 日志",
