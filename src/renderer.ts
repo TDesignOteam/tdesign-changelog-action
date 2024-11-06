@@ -10,7 +10,7 @@ const refactorLabel = ['pref', 'refactor']
 
 export const CHANGELOG_REG = /-\s([A-Z]+)(?:\(([A-Z\s_-]*)\))?\s*:\s(.+)/gi
 export const PULL_NUMBER_REG = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)/g
-export const SKIP_CHANGELOG_REG = /\[x\] 本条 PR 不需要纳入 changelog/i
+export const SKIP_CHANGELOG_REG = /\[x\] 本条 PR 不需要纳入 Changelog/i
 export function getPullNumbers(body: string) {
   const arr = [...body.matchAll(PULL_NUMBER_REG)]
   const pullNumbers = arr.map(n => Number(n[1])) // pr number list
@@ -46,7 +46,10 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
   startGroup(`[renderer] pullRequestList`)
   pullRequestList.forEach((pr) => {
     pr.body = pr.body ? pr.body : ''
-
+    // 跳过机器人PR
+    if (pr.user.type === 'Bot') {
+      return
+    }
     // 不需要纳入 changelog 的 label
     if (pr.labels.find(l => skipChangelogLabel.includes(l.name))) {
       info(`pr ${pr.number} 有skipChangelogLabel`)
