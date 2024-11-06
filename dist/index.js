@@ -30023,7 +30023,7 @@ const docsLabel = ['docs', 'doc', 'documentation'];
 const refactorLabel = ['pref', 'refactor'];
 exports.CHANGELOG_REG = /-\s([A-Z]+)(?:\(([A-Z\s_-]*)\))?\s*:\s(.+)/gi;
 exports.PULL_NUMBER_REG = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)/g;
-exports.SKIP_CHANGELOG_REG = /\[x\] 本条 PR 不需要纳入 changelog/i;
+exports.SKIP_CHANGELOG_REG = /\[x\] 本条 PR 不需要纳入 Changelog/i;
 function getPullNumbers(body) {
     const arr = [...body.matchAll(exports.PULL_NUMBER_REG)];
     const pullNumbers = arr.map(n => Number(n[1])); // pr number list
@@ -30057,6 +30057,10 @@ function renderMarkdown(pullRequestList) {
     (0, core_1.startGroup)(`[renderer] pullRequestList`);
     pullRequestList.forEach((pr) => {
         pr.body = pr.body ? pr.body : '';
+        // 跳过机器人PR
+        if (pr.user.type === 'Bot') {
+            return;
+        }
         // 不需要纳入 changelog 的 label
         if (pr.labels.find(l => skipChangelogLabel.includes(l.name))) {
             (0, core_1.info)(`pr ${pr.number} 有skipChangelogLabel`);
