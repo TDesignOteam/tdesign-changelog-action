@@ -16,6 +16,7 @@ export const changelog = `
 - test(J) : test label in test
 - test : test label in test
 - fix(CHANGELOG_REG): 修复日志冒号前面有空格正则匹配不到
+- fix(CHANGELOG_REG):修复日志冒号后面没空格正则匹配不到
 - fix(test-test): test-test
 `
 
