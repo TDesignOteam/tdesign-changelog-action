@@ -1,5 +1,9 @@
 
 
+## 🌈 0.4.1 `2024-11-08` 
+### 🐞 Bug Fixes
+- `CHANGELOG_REG`: 修复日志格式冒号后没空格正则无法匹配 @liweijie0812 ([#46](https://github.com/TDesignOteam/tdesign-changelog-action/pull/46))
+
 ## 🌈 0.4.0 `2024-11-06` 
 ### 🚀 Features
 - `Log`: 日志提取跳过用户类型为`Bot`的 PR @liweijie0812 ([#42](https://github.com/TDesignOteam/tdesign-changelog-action/pull/42))
