@@ -3,7 +3,7 @@
 exports[`generatorLog > : generatorLogStart 1`] = `
 "(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中
 ## 🌈 x.x.x \`2024-02-24\` 
-### ❗ Breaking Changes
+### 🚨 Breaking Changes
 - \`C\`: a major update label in break @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
 - \`C\`: a major update label in breaking @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))
 - \`g\`: a minor fix label in break @liweijie0812 ([#29](https://github.com/TDesignOteam/tdesign-changelog-action/pull/29))

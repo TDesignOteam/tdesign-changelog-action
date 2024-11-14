@@ -110,7 +110,7 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
   endGroup()
 
   return [
-    categories.breaking.length ? `### ❗ Breaking Changes\n${renderCate(categories.breaking)}` : '',
+    categories.breaking.length ? `### 🚨 Breaking Changes\n${renderCate(categories.breaking)}` : '',
     categories.features.length ? `### 🚀 Features\n${renderCate(categories.features)}` : '',
     categories.bugfix.length ? `### 🐞 Bug Fixes\n${renderCate(categories.bugfix)}` : '',
     categories.refactor.length ? `### 📈 Performance\n${renderCate(categories.refactor)}` : '',
