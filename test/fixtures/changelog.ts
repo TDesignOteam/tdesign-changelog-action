@@ -18,6 +18,8 @@ export const changelog = `
 - fix(CHANGELOG_REG): 修复日志冒号前面有空格正则匹配不到
 - fix(CHANGELOG_REG):修复日志冒号后面没空格正则匹配不到
 - fix(test-test): test-test
+- notice(Component): a new component label in notice
+- notice(Icon): a new icon label in notice
 `
 
 export default changelog

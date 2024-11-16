@@ -7,6 +7,7 @@ const breakingLabel = ['break', 'breaking', 'breaking changes']
 const featureLabel = ['feature', 'feat', 'enhancement']
 const docsLabel = ['docs', 'doc', 'documentation']
 const refactorLabel = ['pref', 'refactor']
+const noticeLabel = ['notice', 'new component']
 
 export const CHANGELOG_REG = /-\s([A-Z]+)(?:\(([A-Z\s_-]*)\))?\s*:\s*(.+)/gi
 export const PULL_NUMBER_REG = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)/g
@@ -41,6 +42,7 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
     bugfix: [] as PRChangelog[],
     refactor: [] as PRChangelog[],
     docs: [] as PRChangelog[],
+    notices: [] as PRChangelog[],
     extra: [] as PRChangelog[],
   }
   startGroup(`[renderer] pullRequestList`)
@@ -96,6 +98,9 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
         else if (isInLabel(docsLabel)) {
           categories.docs.push(logItem)
         }
+        else if (isInLabel(noticeLabel)) {
+          categories.notices.push(logItem)
+        }
         else {
           categories.extra.push(logItem)
         }
@@ -110,6 +115,7 @@ export function renderMarkdown(pullRequestList: PullsData[]) {
   endGroup()
 
   return [
+    categories.notices.length ? `### 🎉 Notices\n${renderCate(categories.notices)}` : '',
     categories.breaking.length ? `### 🚨 Breaking Changes\n${renderCate(categories.breaking)}` : '',
     categories.features.length ? `### 🚀 Features\n${renderCate(categories.features)}` : '',
     categories.bugfix.length ? `### 🐞 Bug Fixes\n${renderCate(categories.bugfix)}` : '',
