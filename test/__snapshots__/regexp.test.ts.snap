@@ -116,6 +116,18 @@ exports[`regexp > : CHANGELOG_REG 1`] = `
     "test-test",
     "test-test",
   ],
+  [
+    "- notice(Component): a new component label in notice",
+    "notice",
+    "Component",
+    "a new component label in notice",
+  ],
+  [
+    "- notice(Icon): a new icon label in notice",
+    "notice",
+    "Icon",
+    "a new icon label in notice",
+  ],
 ]
 `;
 
