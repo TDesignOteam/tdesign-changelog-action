@@ -1,13 +1,6 @@
 import { context } from '@actions/github'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-// vi.mock('@actions/github', () => ({
-//   context: {
-//     action: 'opened',
-//     repo: vi.fn(),
-//   },
-// }))
-
 describe('pull_request', () => {
   afterEach(() => {
     vi.restoreAllMocks()

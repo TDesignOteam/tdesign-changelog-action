@@ -1,10 +1,8 @@
 import { context } from '@actions/github'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { generatorLogStart } from '../../src/generator'
 
 describe('pull_request-payload', () => {
-  beforeEach(() => {
-  })
   afterEach(() => {
     vi.restoreAllMocks()
   })
