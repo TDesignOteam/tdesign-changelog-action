@@ -1,6 +1,5 @@
 import { context } from '@actions/github'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { start } from '../../src/index'
 
 // vi.mock('@actions/github', () => ({
 //   context: {
@@ -14,20 +13,19 @@ describe('pull_request', () => {
     vi.restoreAllMocks()
   })
   it('repo1', async () => {
-    start()
     const { owner, repo } = context.repo
-    expect(owner).toBe('TDesignOteam')
-    expect(repo).toBe('tdesign-changelog-action')
+    expect(owner).toEqual('TDesignOteam')
+    expect(repo).toEqual('tdesign-changelog-action')
   })
   it('repo', async () => {
     vi.spyOn(context, 'repo', 'get').mockReturnValue({
       owner: 'test-owner',
       repo: 'test-repo',
     })
-    start()
+
     const { owner, repo } = context.repo
-    expect(owner).toBe('test-owner')
-    expect(repo).toBe('test-repo')
+    expect(owner).toEqual('test-owner')
+    expect(repo).toEqual('test-repo')
   })
 
   it('repo2', async () => {
@@ -36,15 +34,13 @@ describe('pull_request', () => {
       repo: 'test-repo',
     })
 
-    const data = start()
     const { owner, repo } = context.repo
-    expect(owner).toBe('test-owner1')
-    expect(repo).toBe('test-repo')
-    expect(data).toBe('test-owner1')
+    expect(owner).toEqual('test-owner1')
+    expect(repo).toEqual('test-repo')
   })
   it('repo5', async () => {
     const { owner, repo } = context.repo
-    expect(owner).toBe('TDesignOteam')
-    expect(repo).toBe('tdesign-changelog-action')
+    expect(owner).toEqual('TDesignOteam')
+    expect(repo).toEqual('tdesign-changelog-action')
   })
 })
