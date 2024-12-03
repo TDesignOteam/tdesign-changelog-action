@@ -8,8 +8,10 @@ describe('pull_request-payload', () => {
   })
   it('opened', async () => {
     vi.spyOn(context.payload, 'action', 'get').mockReturnValue('opened')
-
     expect(context.payload.action).toEqual('opened')
+
+    const log = await generatorLogStart(context)
+    expect(log !== '').toBe(true)
   })
   it('closed', async () => {
     vi.spyOn(context.payload, 'action', 'get').mockReturnValue('closed')
@@ -22,9 +24,15 @@ describe('pull_request-payload', () => {
     vi.spyOn(context.payload, 'action', 'get').mockReturnValue('reopened')
 
     expect(context.payload.action).toEqual('reopened')
+
+    const log = await generatorLogStart(context)
+    expect(log !== '').toBe(true)
   })
 
   it('synchronize', async () => {
     expect(context.payload.action).toEqual('synchronize')
+
+    const log = await generatorLogStart(context)
+    expect(log !== '').toBe(true)
   })
 })

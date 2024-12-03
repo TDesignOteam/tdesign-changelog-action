@@ -1,5 +1,6 @@
 import { context } from '@actions/github'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { generatorLogStart } from '../../src/generator'
 
 describe('issue_comment', () => {
   beforeEach(() => {
@@ -9,6 +10,8 @@ describe('issue_comment', () => {
     vi.restoreAllMocks()
   })
   it('eventName', async () => {
-    expect(context.eventName).toBe('issue_comment')
+    expect(context.eventName).toEqual('issue_comment')
+    const log = await generatorLogStart(context)
+    expect(log).toEqual('')
   })
 })
