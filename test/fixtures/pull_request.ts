@@ -1,5 +1,3 @@
-import { vi } from 'vitest'
-
 const context = {
   payload: {
     action: 'synchronize',
@@ -563,9 +561,7 @@ const context = {
   },
 }
 
-vi.mock('@actions/github', async () => {
-  return {
-    ...(await vi.importActual<typeof import('@actions/github')>('@actions/github')),
-    context,
-  }
-})
+const opened = context
+opened.payload.action = 'opened'
+
+export { opened }

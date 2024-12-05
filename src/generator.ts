@@ -7,6 +7,15 @@ import { getPullNumbers, renderMarkdown } from './renderer'
 import { useOctokit } from './useOctokit'
 
 export async function generatorLogStart(context) {
+  if (context.eventName !== 'pull_request') {
+    info(`[generator] eventName is not pull_request, skip`)
+    return ''
+  }
+  if (context.payload.action === 'closed') {
+    info(`[generator] PR is closed, skip`)
+    return ''
+  }
+
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ''
   const { generateReleaseNotes, getPullRequest } = useOctokit({ token: GITHUB_TOKEN })
   let tag = getInput('tag', { required: false })
