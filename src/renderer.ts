@@ -9,7 +9,7 @@ const docsLabel = ['docs', 'doc', 'documentation']
 const refactorLabel = ['pref', 'refactor']
 const noticeLabel = ['notice', 'new component']
 
-export const CHANGELOG_REG = /-\s([A-Z]+)(?:\(([A-Z\s_-]*)\))?\s*:\s*(.+)/gi
+export const CHANGELOG_REG = /-\s([A-Z]+)(?:\(([A-Z\s_-]*)\))?\s*:\s(.+)/gi
 export const PULL_NUMBER_REG = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)/g
 export const SKIP_CHANGELOG_REG = /\[x\] 本条 PR 不需要纳入 Changelog/i
 export function getPullNumbers(body: string) {

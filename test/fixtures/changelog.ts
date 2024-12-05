@@ -20,6 +20,8 @@ export const changelog = `
 - fix(test-test): test-test
 - notice(Component): a new component label in notice
 - notice(Icon): a new icon label in notice
+- 树形组件选项禁用 https://github.com/Tencent/tdesign-vue-next/issues/4809
+- https://github.com/Tencent/tdesign-vue-next/issues/4809
 `
 
 export default changelog
