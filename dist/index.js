@@ -30022,7 +30022,7 @@ const featureLabel = ['feature', 'feat', 'enhancement'];
 const docsLabel = ['docs', 'doc', 'documentation'];
 const refactorLabel = ['pref', 'refactor'];
 const noticeLabel = ['notice', 'new component'];
-exports.CHANGELOG_REG = /-\s([A-Z]+)(?:\(([A-Z\s_-]*)\))?\s*:\s*(.+)/gi;
+exports.CHANGELOG_REG = /-\s([A-Z]+)(?:\(([A-Z\s_-]*)\))?\s*:\s(.+)/gi;
 exports.PULL_NUMBER_REG = /in\shttps:\/\/github\.com\/.+\/pull\/(\d+)/g;
 exports.SKIP_CHANGELOG_REG = /\[x\] 本条 PR 不需要纳入 Changelog/i;
 function getPullNumbers(body) {
