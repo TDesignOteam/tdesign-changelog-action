@@ -30041,7 +30041,8 @@ function regToPrObj(arr) {
 function renderCate(cate) {
     return `${cate.sort().map((pr) => {
         const title = pr.changelog ? `\`${pr.changelog.component || pr.changelog.cate}\`: ${pr.changelog.desc}` : pr.title;
-        return `- ${title} @${pr.user.login} ([#${pr.number}](${pr.html_url}))`;
+        const contributor = pr.user.login === 'tdesign-bot' ? '' : ` @${pr.user.login} `;
+        return `- ${title}${contributor}([#${pr.number}](${pr.html_url}))`;
     }).join('\n')}`;
 }
 function renderMarkdown(pullRequestList) {
