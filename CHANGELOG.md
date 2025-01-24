@@ -1,5 +1,9 @@
 
 
+## 🌈 0.5.2 `2025-01-24` 
+### 🚀 Features
+- `Log`: 贡献者是 `tdesign-bot` 不加入标题 @liweijie0812 ([#58](https://github.com/TDesignOteam/tdesign-changelog-action/pull/58))
+
 ## 🌈 0.5.0 `2024-11-17` 
 ### 🚀 Features
 - `Log`: 更换 `Breaking Changes` emoji  为 🚨 @liweijie0812 ([#49](https://github.com/TDesignOteam/tdesign-changelog-action/pull/49))
