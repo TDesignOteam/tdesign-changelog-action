@@ -254,6 +254,22 @@ describe('utils', () => {
     expect(() => getPullRequestReleaseDirs([file])).toThrow(/patch for .*pubspec\.yaml.* is unavailable/)
   })
 
+  it('fails when a release changelog patch is unavailable', () => {
+    const file = { filename: 'fixtures/repo1/packages/pkg-a/CHANGELOG.md', status: 'modified', patch: undefined } as any
+
+    expect(() => getPullRequestReleaseDirs([file])).toThrow(/release changelog.*patch.*is unavailable/)
+  })
+
+  it('uses the prerelease identifier as the npm dist-tag', () => {
+    const file = {
+      filename: 'fixtures/repo4/package.json',
+      status: 'modified',
+      patch: '@@ -2,3 +2,3 @@\n-  "version": "1.0.0",\n+  "version": "1.0.1-rc.1",',
+    } as any
+
+    expect(getPullRequestReleaseDirs([file])[0].tag).toBe('rc')
+  })
+
   it('fails when the checked-out manifest version does not match the diff', () => {
     const file = {
       ...flutter_pull_request_files[0],
@@ -326,9 +342,15 @@ describe('utils', () => {
     const body = '# 🎉 发布 pkg-a\n## 🌈 1.0.0\n\n- feature a\n---\n# 🎉 发布 pkg-b\n## 🌈 2.0.0\n\n- feature b'
 
     expect(extractReleaseLogs(body)).toEqual([
-      { pkgName: 'pkg-a', changelog: '## 🌈 1.0.0\n\n- feature a\n\n' },
-      { pkgName: 'pkg-b', changelog: '## 🌈 2.0.0\n\n- feature b\n\n' },
+      { pkgName: 'pkg-a', version: '1.0.0', changelog: '## 🌈 1.0.0\n\n- feature a\n\n' },
+      { pkgName: 'pkg-b', version: '2.0.0', changelog: '## 🌈 2.0.0\n\n- feature b\n\n' },
     ])
+  })
+
+  it('extractReleaseLogs preserves prose and code blocks', () => {
+    const body = '# 🎉 发布 pkg-a\n## 🌈 1.0.0\n\nMigration required.\n\n```ts\nupgrade()\n```'
+
+    expect(extractReleaseLogs(body)[0].changelog).toContain('Migration required.\n\n```ts\nupgrade()\n```')
   })
 
   it('extractReleaseLogs rejects a nested package heading', () => {

@@ -1,5 +1,5 @@
 import type { PullRequestData } from '../types'
-import { unlinkSync } from 'node:fs'
+import { existsSync, unlinkSync } from 'node:fs'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import { extractChangelog, getInputPkgs, getPrCommentWhitelist } from '../utils'
@@ -10,7 +10,8 @@ export async function workflow_run(token: string) {
   if (github.context.eventName !== 'workflow_run') {
     return false
   }
-  if (github.context.payload.workflow_run?.event !== 'pull_request_review') {
+  const workflowRun = github.context.payload.workflow_run
+  if (workflowRun?.event !== 'pull_request_review') {
     core.warning(`github.context.payload.workflow_run?.event !== 'pull_request_review'`)
     return false
   }
@@ -23,9 +24,19 @@ export async function workflow_run(token: string) {
     return false
   }
   const prNumber = Number(core.getInput('pr_number', { required: true }))
+  if (!Number.isInteger(prNumber) || prNumber <= 0 || !workflowRun.pull_requests.some((pr: { number: number }) => pr.number === prNumber)) {
+    core.warning(`pr_number is not associated with this workflow run: ${prNumber}`)
+    return false
+  }
+  const actor = workflowRun.actor?.login || github.context.actor
+  const triggeringActor = workflowRun.triggering_actor?.login || github.context.actor
+  if (actor !== triggeringActor) {
+    core.warning(`workflow rerun actor does not match original actor: ${triggeringActor}`)
+    return false
+  }
   const whitelist = await getPrCommentWhitelist()
-  if (!whitelist.includes(github.context.actor)) {
-    core.warning(`no in whitelist:${github.context.actor}`)
+  if (!whitelist.includes(actor)) {
+    core.warning(`no in whitelist:${actor}`)
     return false
   }
 
@@ -50,7 +61,8 @@ export async function workflow_run(token: string) {
   })
   if (logs) {
     const body = `### 📝 更新日志\n\n${logs}\n\n`
-    unlinkSync('./pr-id.txt')
+    if (existsSync('./pr-id.txt'))
+      unlinkSync('./pr-id.txt')
     await confirmChangelog(prNumber, body, token)
   }
 }

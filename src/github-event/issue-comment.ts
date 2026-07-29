@@ -163,6 +163,9 @@ async function confirmReleaseLog(prNumber: number, log: string, token: string) {
 
   const { getPullRequestData, getPullRequestFiles } = useGithub(token)
   const prData = await getPullRequestData(prNumber) as PullRequestData
+  if (prData.state !== 'open' || !prData.head.ref.startsWith('release/') || checkIsForkPr(prData)) {
+    throw new Error('Release changelog confirmation requires an open, same-repository release pull request')
+  }
   const { cloneRepo, checkoutBranch, isNeedCommit } = useGit(token)
   const defaultBranch = prData.base.ref
   await cloneRepo()
@@ -179,6 +182,12 @@ async function confirmReleaseLog(prNumber: number, log: string, token: string) {
   const emptyPackages = releaseLogs.filter(item => !item.changelog.trim()).map(item => item.pkgName)
   if (emptyPackages.length) {
     throw new Error(`Release log is empty for packages: ${emptyPackages.join(', ')}`)
+  }
+  const invalidVersions = releaseLogs
+    .filter(item => releaseDirs.find(release => release.name === item.pkgName)?.version !== item.version)
+    .map(item => item.pkgName)
+  if (invalidVersions.length) {
+    throw new Error(`Release log version does not match the package manifest for: ${invalidVersions.join(', ')}`)
   }
 
   for (const release of releaseDirs) {

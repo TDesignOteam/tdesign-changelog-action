@@ -1,6 +1,6 @@
 import type { ReleasePackage } from '../types'
 import type { Package } from './get-packages'
-import { exec } from '@actions/exec'
+import { exec, getExecOutput } from '@actions/exec'
 
 export function sortReleasePackages(releases: ReleasePackage[], packages: Package[]) {
   const releaseIndexes = new Map<string, number>()
@@ -52,9 +52,17 @@ export function sortReleasePackages(releases: ReleasePackage[], packages: Packag
   return sorted
 }
 
-export function publishRelease(release: ReleasePackage) {
+export async function publishRelease(release: ReleasePackage, singleMode = false) {
   if (release.type === 'flutter')
-    return Promise.resolve(0)
+    return 0
+
+  const packageManager = singleMode ? 'npm' : 'pnpm'
+  const published = await getExecOutput(packageManager, ['view', `${release.name}@${release.version}`, 'version', '--json'], { ignoreReturnCode: true })
+  if (published.exitCode === 0)
+    return 0
+
+  if (singleMode)
+    return exec('npm', ['publish', release.dir, '--tag', release.tag])
 
   return exec('pnpm', ['publish', '--no-git-checks', '--filter', release.name, '--tag', release.tag])
 }

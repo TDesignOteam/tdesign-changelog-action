@@ -388,7 +388,7 @@ export const workflow_run_data = {
   sha: 'f8832464d139d3cea5e55942bb10501aa51f9b24',
   ref: 'refs/heads/develop',
   workflow: 'auto-changelog-callback',
-  action: '__TDesignOteam_flow-pilot-action',
+  action: '__TDesignOteam_tdesign-changelog-action',
   actor: 'liweijie0812',
   job: 'comment',
   runNumber: 29,

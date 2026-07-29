@@ -136,8 +136,8 @@ export function extractReleaseLog(markdown: string) {
  * 提取单条或合并后的 release 日志
  */
 export function extractReleaseLogs(markdown: string, expectedHeading?: ReleaseHeading) {
-  const releaseLogs: Array<{ pkgName: string, changelog: string }> = []
-  let currentLog: { pkgName: string, changelog: string } | undefined
+  const releaseLogs: Array<{ pkgName: string, version: string, changelog: string }> = []
+  let currentLog: { pkgName: string, version: string, changelog: string } | undefined
 
   parseMarkdown(markdown.replace(RN_TO_LF_REG, '\n')).forEach((token) => {
     if (token.type === 'heading') {
@@ -154,6 +154,8 @@ export function extractReleaseLogs(markdown: string, expectedHeading?: ReleaseHe
       }
       if (token.depth !== 1) {
         if (currentLog) {
+          if (token.depth === 2 && token.text.startsWith('🌈'))
+            currentLog.version = token.text.slice('🌈'.length).trim().split(/\s+/)[0] || ''
           currentLog.changelog += `${token.raw.trimEnd()}\n\n`
         }
         return
@@ -163,14 +165,14 @@ export function extractReleaseLogs(markdown: string, expectedHeading?: ReleaseHe
       if (heading && !pkgName) {
         throw new Error('Release package heading is missing a package name')
       }
-      currentLog = pkgName ? { pkgName, changelog: '' } : undefined
+      currentLog = pkgName ? { pkgName, version: '', changelog: '' } : undefined
       if (currentLog) {
         releaseLogs.push(currentLog)
       }
       return
     }
 
-    if (currentLog && token.type === 'list') {
+    if (currentLog && token.type !== 'space' && token.type !== 'hr') {
       currentLog.changelog += `${token.raw.trimEnd()}\n\n`
     }
   })
@@ -243,14 +245,8 @@ export function stashPackageChangelog(prData: PullRequestData, packages: Package
     const logContent = `${logHead}${logs}\n`
 
     core.info(`Attempting to write to ${logFilePath}`)
-    try {
-      writeFileSync(logFilePath, logContent, 'utf8')
-      core.info(`Successfully wrote changelog to ${logFilePath}`)
-    }
-    catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      core.info(`Failed to write changelog to ${logFilePath}: ${message}`)
-    }
+    writeFileSync(logFilePath, logContent, 'utf8')
+    core.info(`Successfully wrote changelog to ${logFilePath}`)
   })
 }
 
@@ -308,6 +304,9 @@ export function getPullRequestReleaseDirs(prFiles: PullRequestFiles, packages?: 
     const changelogKey = customChangelogPath ? singleChangelogKey : dirname(file.filename)
     const isZhChangelog = customChangelogPath ? file.filename === customChangelogPath : file.filename.includes('CHANGELOG.md')
     const isEnChangelog = customEnChangelogPath ? file.filename === customEnChangelogPath : file.filename.includes('CHANGELOG.en-US.md')
+
+    if ((isZhChangelog || isEnChangelog) && !file.patch)
+      throw new Error(`Cannot determine release changelog because the patch for "${file.filename}" is unavailable`)
 
     if (isZhChangelog && file.patch) {
       const logs: string[] = []
@@ -389,13 +388,12 @@ export function getPullRequestReleaseDirs(prFiles: PullRequestFiles, packages?: 
     if (String(packageData.version) !== version)
       throw new Error(`Package manifest "${file.filename}" has version "${packageData.version}", expected "${version}" from the pull request diff`)
 
-    let tag = 'latest'
-    if (version.includes('beta')) {
+    const prereleaseTag = version.match(/-([0-9A-Z-]+)(?:\.|$)/i)?.[1]?.toLowerCase()
+    let tag = prereleaseTag || 'latest'
+    if (!prereleaseTag && version.includes('beta'))
       tag = 'beta'
-    }
-    if (version.includes('alpha')) {
+    if (!prereleaseTag && version.includes('alpha'))
       tag = 'alpha'
-    }
     const changelogKey = customChangelogPath ? singleChangelogKey : dirname(file.filename)
     let changelog = zhChangelogs[changelogKey] || ''
     if (changelog && enChangelogs[changelogKey]) {
@@ -670,5 +668,5 @@ export function checkReleaseBranch(prData: PullRequestData) {
   return prData.head.ref.startsWith('release/')
 }
 export function checkIsForkPr(prData: PullRequestData) {
-  return prData.head.user.login !== github.context.repo.owner
+  return !prData.head.repo || prData.head.repo.full_name !== prData.base.repo.full_name
 }

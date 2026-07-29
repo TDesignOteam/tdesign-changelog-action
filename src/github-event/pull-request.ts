@@ -118,7 +118,7 @@ export async function pull_request(token: string) {
     }
     if (github.context.payload.action === 'closed' && github.context.payload.pull_request?.merged) {
       const prNumber = getPullRequestNumber()
-      const { createRelease, getPullRequestFiles } = useGithub(token)
+      const { createRelease, getPullRequestFiles, hasRelease } = useGithub(token)
       if (!pullRequestData.merge_commit_sha)
         throw new Error('The merged pull request does not have a merge commit SHA')
       await useGit(token).checkoutCommit(pullRequestData.merge_commit_sha)
@@ -140,19 +140,17 @@ export async function pull_request(token: string) {
           info(`${release.name} is private package, skip publish`)
         }
         else if (release.type === 'node') {
-          await publishRelease(release)
+          await publishRelease(release, usePlainTag)
         }
 
         if (shouldCreateRelease) {
-          try {
+          if (await hasRelease(title)) {
+            info(`${release.name} release already exists: ${title}`)
+          }
+          else {
             info(`Creating release for ${release.name}: ${title}`)
             await createRelease(title, title, release.changelog, pullRequestData.merge_commit_sha, usePlainTag && release.tag !== 'latest')
             info(`${release.name} release created: ${title}`)
-          }
-          catch (err) {
-            if (usePlainTag)
-              throw err
-            info(`Failed to create release for ${release.name}: ${err}`)
           }
         }
       }

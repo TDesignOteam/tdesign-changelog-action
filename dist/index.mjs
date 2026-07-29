@@ -30974,6 +30974,19 @@ function useGithub(token) {
 			prerelease
 		});
 	}
+	async function hasRelease(tag) {
+		try {
+			await octokit.rest.repos.getReleaseByTag({
+				owner,
+				repo,
+				tag
+			});
+			return true;
+		} catch (error) {
+			if (error && typeof error === "object" && "status" in error && error.status === 404) return false;
+			throw error;
+		}
+	}
 	async function getCommitsBetweenRefs(base, head) {
 		if (!base) return (await octokit.paginate(octokit.rest.repos.listCommits, {
 			owner,
@@ -31027,6 +31040,7 @@ function useGithub(token) {
 		getCommentList,
 		getRequestedReviewers,
 		createRelease,
+		hasRelease,
 		getMergedPrNumbersBetweenRefs
 	};
 }
@@ -31111,19 +31125,23 @@ function extractReleaseLogs(markdown, expectedHeading) {
 			if (heading && token.depth !== 1) throw new Error(`Release package heading must be level 1: ${token.raw.trim()}`);
 			if (heading && expectedHeading && heading !== expectedHeading) throw new Error("Release log contains mixed languages");
 			if (token.depth !== 1) {
-				if (currentLog) currentLog.changelog += `${token.raw.trimEnd()}\n\n`;
+				if (currentLog) {
+					if (token.depth === 2 && token.text.startsWith("🌈")) currentLog.version = token.text.slice(2).trim().split(/\s+/)[0] || "";
+					currentLog.changelog += `${token.raw.trimEnd()}\n\n`;
+				}
 				return;
 			}
 			const pkgName = heading ? token.text.replace(heading, "").trim() : "";
 			if (heading && !pkgName) throw new Error("Release package heading is missing a package name");
 			currentLog = pkgName ? {
 				pkgName,
+				version: "",
 				changelog: ""
 			} : void 0;
 			if (currentLog) releaseLogs.push(currentLog);
 			return;
 		}
-		if (currentLog && token.type === "list") currentLog.changelog += `${token.raw.trimEnd()}\n\n`;
+		if (currentLog && token.type !== "space" && token.type !== "hr") currentLog.changelog += `${token.raw.trimEnd()}\n\n`;
 	});
 	return releaseLogs;
 }
@@ -31168,12 +31186,8 @@ function stashPackageChangelog(prData, packages, prChangelog) {
 			"\n"
 		].join("\n")}${logs}\n`;
 		info(`Attempting to write to ${logFilePath}`);
-		try {
-			writeFileSync(logFilePath, logContent, "utf8");
-			info(`Successfully wrote changelog to ${logFilePath}`);
-		} catch (error) {
-			info(`Failed to write changelog to ${logFilePath}: ${error instanceof Error ? error.message : String(error)}`);
-		}
+		writeFileSync(logFilePath, logContent, "utf8");
+		info(`Successfully wrote changelog to ${logFilePath}`);
 	});
 }
 function getManifestType(filename) {
@@ -31214,6 +31228,7 @@ function getPullRequestReleaseDirs(prFiles, packages) {
 		const changelogKey = customChangelogPath ? singleChangelogKey : dirname$1(file.filename);
 		const isZhChangelog = customChangelogPath ? file.filename === customChangelogPath : file.filename.includes("CHANGELOG.md");
 		const isEnChangelog = customEnChangelogPath ? file.filename === customEnChangelogPath : file.filename.includes("CHANGELOG.en-US.md");
+		if ((isZhChangelog || isEnChangelog) && !file.patch) throw new Error(`Cannot determine release changelog because the patch for "${file.filename}" is unavailable`);
 		if (isZhChangelog && file.patch) {
 			const logs = [];
 			let isSkip = false;
@@ -31267,9 +31282,10 @@ function getPullRequestReleaseDirs(prFiles, packages) {
 		if (typeof packageData.name !== "string") throw new Error(`Package manifest "${file.filename}" is missing a valid "name" field`);
 		if (typeof packageData.version !== "string" && typeof packageData.version !== "number") throw new Error(`Package manifest "${file.filename}" is missing a valid "version" field`);
 		if (String(packageData.version) !== version) throw new Error(`Package manifest "${file.filename}" has version "${packageData.version}", expected "${version}" from the pull request diff`);
-		let tag = "latest";
-		if (version.includes("beta")) tag = "beta";
-		if (version.includes("alpha")) tag = "alpha";
+		const prereleaseTag = version.match(/-([0-9A-Z-]+)(?:\.|$)/i)?.[1]?.toLowerCase();
+		let tag = prereleaseTag || "latest";
+		if (!prereleaseTag && version.includes("beta")) tag = "beta";
+		if (!prereleaseTag && version.includes("alpha")) tag = "alpha";
 		const changelogKey = customChangelogPath ? singleChangelogKey : dirname$1(file.filename);
 		let changelog = zhChangelogs[changelogKey] || "";
 		if (changelog && enChangelogs[changelogKey]) changelog = [
@@ -31468,7 +31484,7 @@ function getConfiguredPackages(path) {
 	return packageNames.length ? packages.filter((pkg) => packageNames.includes(pkg.name)) : packages;
 }
 function checkIsForkPr(prData) {
-	return prData.head.user.login !== context.repo.owner;
+	return !prData.head.repo || prData.head.repo.full_name !== prData.base.repo.full_name;
 }
 //#endregion
 //#region src/utils/git.ts
@@ -31685,6 +31701,7 @@ async function confirmReleaseLog(prNumber, log, token) {
 	if (changelogMap.size !== releaseLogs.length) throw new Error("Release log contains duplicate package names");
 	const { getPullRequestData, getPullRequestFiles } = useGithub(token);
 	const prData = await getPullRequestData(prNumber);
+	if (prData.state !== "open" || !prData.head.ref.startsWith("release/") || checkIsForkPr(prData)) throw new Error("Release changelog confirmation requires an open, same-repository release pull request");
 	const { cloneRepo, checkoutBranch, isNeedCommit } = useGit(token);
 	const defaultBranch = prData.base.ref;
 	await cloneRepo();
@@ -31698,6 +31715,8 @@ async function confirmReleaseLog(prNumber, log, token) {
 	if (unknownPackages.length) throw new Error(`Release log contains unknown packages: ${unknownPackages.join(", ")}`);
 	const emptyPackages = releaseLogs.filter((item) => !item.changelog.trim()).map((item) => item.pkgName);
 	if (emptyPackages.length) throw new Error(`Release log is empty for packages: ${emptyPackages.join(", ")}`);
+	const invalidVersions = releaseLogs.filter((item) => releaseDirs.find((release) => release.name === item.pkgName)?.version !== item.version).map((item) => item.pkgName);
+	if (invalidVersions.length) throw new Error(`Release log version does not match the package manifest for: ${invalidVersions.join(", ")}`);
 	for (const release of releaseDirs) {
 		const changelog = changelogMap.get(release.name);
 		if (!changelog) continue;
@@ -31805,8 +31824,20 @@ function sortReleasePackages(releases, packages) {
 	}
 	return sorted;
 }
-function publishRelease(release) {
-	if (release.type === "flutter") return Promise.resolve(0);
+async function publishRelease(release, singleMode = false) {
+	if (release.type === "flutter") return 0;
+	if ((await getExecOutput(singleMode ? "npm" : "pnpm", [
+		"view",
+		`${release.name}@${release.version}`,
+		"version",
+		"--json"
+	], { ignoreReturnCode: true })).exitCode === 0) return 0;
+	if (singleMode) return exec("npm", [
+		"publish",
+		release.dir,
+		"--tag",
+		release.tag
+	]);
 	return exec("pnpm", [
 		"publish",
 		"--no-git-checks",
@@ -83028,11 +83059,7 @@ async function translateText(secretId, secretKey, text) {
 		Source: "zh",
 		Target: "en"
 	};
-	try {
-		return (await client.ChatTranslations(params)).Choices?.map((choice) => choice?.Message?.Content).join("\n") || "";
-	} catch {
-		return "translation failed";
-	}
+	return (await client.ChatTranslations(params)).Choices?.map((choice) => choice?.Message?.Content).join("\n") || "";
 }
 //#endregion
 //#region src/github-event/pull-request.ts
@@ -83111,7 +83138,7 @@ async function pull_request(token) {
 		if (!isRelease) return false;
 		if (context.payload.action === "closed" && context.payload.pull_request?.merged) {
 			const prNumber = getPullRequestNumber();
-			const { createRelease, getPullRequestFiles } = useGithub(token);
+			const { createRelease, getPullRequestFiles, hasRelease } = useGithub(token);
 			if (!pullRequestData.merge_commit_sha) throw new Error("The merged pull request does not have a merge commit SHA");
 			await useGit(token).checkoutCommit(pullRequestData.merge_commit_sha);
 			const changeFiles = await getPullRequestFiles(prNumber);
@@ -83128,14 +83155,12 @@ async function pull_request(token) {
 				const title = usePlainTag ? release.version : `${release.name}@${release.version}`;
 				const shouldCreateRelease = usePlainTag || release.type === "flutter" || Boolean(release.changelog && release.tag === "latest");
 				if (release.private) info(`${release.name} is private package, skip publish`);
-				else if (release.type === "node") await publishRelease(release);
-				if (shouldCreateRelease) try {
+				else if (release.type === "node") await publishRelease(release, usePlainTag);
+				if (shouldCreateRelease) if (await hasRelease(title)) info(`${release.name} release already exists: ${title}`);
+				else {
 					info(`Creating release for ${release.name}: ${title}`);
 					await createRelease(title, title, release.changelog, pullRequestData.merge_commit_sha, usePlainTag && release.tag !== "latest");
 					info(`${release.name} release created: ${title}`);
-				} catch (err) {
-					if (usePlainTag) throw err;
-					info(`Failed to create release for ${release.name}: ${err}`);
 				}
 			}
 		}
@@ -83156,7 +83181,8 @@ async function pull_request_review(token) {
 //#region src/github-event/workflow-run.ts
 async function workflow_run(token) {
 	if (context.eventName !== "workflow_run") return false;
-	if (context.payload.workflow_run?.event !== "pull_request_review") {
+	const workflowRun = context.payload.workflow_run;
+	if (workflowRun?.event !== "pull_request_review") {
 		warning(`github.context.payload.workflow_run?.event !== 'pull_request_review'`);
 		return false;
 	}
@@ -83169,8 +83195,18 @@ async function workflow_run(token) {
 		return false;
 	}
 	const prNumber = Number(getInput("pr_number", { required: true }));
-	if (!(await getPrCommentWhitelist()).includes(context.actor)) {
-		warning(`no in whitelist:${context.actor}`);
+	if (!Number.isInteger(prNumber) || prNumber <= 0 || !workflowRun.pull_requests.some((pr) => pr.number === prNumber)) {
+		warning(`pr_number is not associated with this workflow run: ${prNumber}`);
+		return false;
+	}
+	const actor = workflowRun.actor?.login || context.actor;
+	const triggeringActor = workflowRun.triggering_actor?.login || context.actor;
+	if (actor !== triggeringActor) {
+		warning(`workflow rerun actor does not match original actor: ${triggeringActor}`);
+		return false;
+	}
+	if (!(await getPrCommentWhitelist()).includes(actor)) {
+		warning(`no in whitelist:${actor}`);
 		return false;
 	}
 	const { getPullRequestData } = useGithub(token);
@@ -83188,7 +83224,7 @@ async function workflow_run(token) {
 	});
 	if (logs) {
 		const body = `### 📝 更新日志\n\n${logs}\n\n`;
-		unlinkSync("./pr-id.txt");
+		if (existsSync$1("./pr-id.txt")) unlinkSync("./pr-id.txt");
 		await confirmChangelog(prNumber, body, token);
 	}
 }

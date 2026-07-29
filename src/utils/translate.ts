@@ -23,11 +23,6 @@ export async function translateText(secretId: string, secretKey: string, text: s
     Source: 'zh',
     Target: 'en',
   }
-  try {
-    const translateText = await client.ChatTranslations(params)
-    return translateText.Choices?.map(choice => choice?.Message?.Content).join('\n') || ''
-  }
-  catch {
-    return 'translation failed'
-  }
+  const translateText = await client.ChatTranslations(params)
+  return translateText.Choices?.map(choice => choice?.Message?.Content).join('\n') || ''
 }

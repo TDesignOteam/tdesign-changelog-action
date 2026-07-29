@@ -69,6 +69,7 @@ exports[`utils > extractReleaseLog 1`] = `
 
 ",
   "pkgName": "pkg-a",
+  "version": "1.0.1",
 }
 `;
 
@@ -90,6 +91,7 @@ exports[`utils > extractReleaseLogs (merged) 1`] = `
 
 ",
     "pkgName": "pkg-a",
+    "version": "1.0.1",
   },
   {
     "changelog": "## 🌈 2.0.0 \`2025-4-7\`
@@ -105,6 +107,7 @@ exports[`utils > extractReleaseLogs (merged) 1`] = `
 
 ",
     "pkgName": "pkg-b",
+    "version": "2.0.0",
   },
   {
     "changelog": "## 🌈 3.0.0 \`2025-4-7\`
@@ -115,6 +118,7 @@ exports[`utils > extractReleaseLogs (merged) 1`] = `
 
 ",
     "pkgName": "pkg-c",
+    "version": "3.0.0",
   },
 ]
 `;
@@ -238,15 +242,15 @@ exports[`utils > getMergedPullRequestReleaseDirs 3`] = `
 exports[`utils > getStashChangelog 1`] = `
 {
   "changelogs": [
-    "- feat(Button): New Component @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
-    "- feat(Hook): add renderNodeJSX @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
-    "- feat(Hook): add renderIcon @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
-    "- feat(useChat): add useChat @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
-    "- chore(Hook): add Hook @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
-    "- other(utils): add \`isBoolean\` function @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
-    "- chore: a chore log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
-    "- other: a other log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
-    "- fix(card): fix card bug @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
+    "- feat(Button): New Component @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))",
+    "- feat(Hook): add renderNodeJSX @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))",
+    "- feat(Hook): add renderIcon @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))",
+    "- feat(useChat): add useChat @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))",
+    "- chore(Hook): add Hook @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))",
+    "- other(utils): add \`isBoolean\` function @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))",
+    "- chore: a chore log @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))",
+    "- other: a other log @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))",
+    "- fix(card): fix card bug @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))",
   ],
   "pkg": "pkg-a",
   "version": "1.0.0",
@@ -256,22 +260,22 @@ exports[`utils > getStashChangelog 1`] = `
 exports[`utils > renderChangelogMarkdown 1`] = `
 "### 🚀 Features
 
-- \`Button\`: New Component @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- \`Button\`: New Component @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
 - \`Hook\`: 
-  - add renderNodeJSX @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-  - add renderIcon @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- \`useChat\`: add useChat @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+  - add renderNodeJSX @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+  - add renderIcon @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- \`useChat\`: add useChat @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
 
 ### 🐞 Bug Fixes
 
-- \`Card\`: fix card bug @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- \`Card\`: fix card bug @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
 
 ### 🚧 Others
 
-- a chore log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- a other log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- \`Hook\`: add Hook @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- \`Utils\`: add \`isBoolean\` function @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- a chore log @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- a other log @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- \`Hook\`: add Hook @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- \`Utils\`: add \`isBoolean\` function @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
 "
 `;
 
@@ -281,10 +285,10 @@ pr_number: 6
 contributor: liweijie0812
 ---
 
-- feat(Button): New Component @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- feat(Hook): add renderNodeJSX @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- feat(Hook): add renderIcon @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- feat(useChat): add useChat @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- feat(Button): New Component @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- feat(Hook): add renderNodeJSX @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- feat(Hook): add renderIcon @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- feat(useChat): add useChat @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
 "
 `;
 
@@ -294,7 +298,7 @@ pr_number: 6
 contributor: liweijie0812
 ---
 
-- chore(utils): add \`isString\` function @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- chore(utils): add \`isString\` function @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
 "
 `;
 
@@ -304,7 +308,7 @@ pr_number: 6
 contributor: liweijie0812
 ---
 
-- feat(Button): New Component @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- feat(Button): New Component @liweijie0812 ([#6](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
 "
 `;
 
@@ -314,11 +318,11 @@ pr_number: 7
 contributor: liweijie0812
 ---
 
-- chore(Hook): add Hook @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- other(utils): add \`isBoolean\` function @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- chore: a chore log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- other: a other log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- fix(card): fix card bug @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- chore(Hook): add Hook @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- other(utils): add \`isBoolean\` function @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- chore: a chore log @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- other: a other log @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- fix(card): fix card bug @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
 "
 `;
 
@@ -328,7 +332,7 @@ pr_number: 7
 contributor: liweijie0812
 ---
 
-- other(utils): add \`isBoolean\` function @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- fix(Button): fix Button @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- other(utils): add \`isBoolean\` function @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- fix(Button): fix Button @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
 "
 `;

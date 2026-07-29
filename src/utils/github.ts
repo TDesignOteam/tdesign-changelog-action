@@ -95,6 +95,18 @@ export default function useGithub(token: string) {
     })
   }
 
+  async function hasRelease(tag: string) {
+    try {
+      await octokit.rest.repos.getReleaseByTag({ owner, repo, tag })
+      return true
+    }
+    catch (error) {
+      if (error && typeof error === 'object' && 'status' in error && error.status === 404)
+        return false
+      throw error
+    }
+  }
+
   async function getCommitsBetweenRefs(base: string | undefined, head: string) {
     if (!base) {
       const commits = await octokit.paginate(octokit.rest.repos.listCommits, {
@@ -155,5 +167,5 @@ export default function useGithub(token: string) {
     return [...prNumbers]
   }
 
-  return { getPullRequestData, getPullRequestFiles, getOpenPullRequestByHead, createPullRequest, addPullRequestLabels, addComment, updateComment, getCommentList, getRequestedReviewers, createRelease, getMergedPrNumbersBetweenRefs }
+  return { getPullRequestData, getPullRequestFiles, getOpenPullRequestByHead, createPullRequest, addPullRequestLabels, addComment, updateComment, getCommentList, getRequestedReviewers, createRelease, hasRelease, getMergedPrNumbersBetweenRefs }
 }

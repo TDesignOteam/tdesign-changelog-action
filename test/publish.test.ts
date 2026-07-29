@@ -1,10 +1,10 @@
 import type { ReleasePackage } from '../src/types'
 import type { Package } from '../src/utils/get-packages'
-import { exec } from '@actions/exec'
+import { exec, getExecOutput } from '@actions/exec'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { publishRelease, sortReleasePackages } from '../src/utils/publish'
 
-vi.mock('@actions/exec', () => ({ exec: vi.fn() }))
+vi.mock('@actions/exec', () => ({ exec: vi.fn(), getExecOutput: vi.fn() }))
 
 const release: ReleasePackage = {
   dir: 'packages/example',
@@ -81,17 +81,35 @@ describe('sortReleasePackages', () => {
 describe('publishRelease', () => {
   beforeEach(() => {
     vi.mocked(exec).mockReset()
+    vi.mocked(getExecOutput).mockReset().mockResolvedValue({ exitCode: 1 } as any)
   })
 
   it('publishes Node packages with pnpm', async () => {
     await publishRelease(release)
 
+    expect(getExecOutput).toHaveBeenCalledWith('pnpm', ['view', 'example@1.0.0', 'version', '--json'], { ignoreReturnCode: true })
     expect(exec).toHaveBeenCalledWith('pnpm', ['publish', '--no-git-checks', '--filter', 'example', '--tag', 'latest'])
+  })
+
+  it('publishes single-repository Node packages with npm', async () => {
+    await publishRelease(release, true)
+
+    expect(getExecOutput).toHaveBeenCalledWith('npm', ['view', 'example@1.0.0', 'version', '--json'], { ignoreReturnCode: true })
+    expect(exec).toHaveBeenCalledWith('npm', ['publish', 'packages/example', '--tag', 'latest'])
+  })
+
+  it('skips a package version that is already published', async () => {
+    vi.mocked(getExecOutput).mockResolvedValue({ exitCode: 0 } as any)
+
+    await publishRelease(release)
+
+    expect(exec).not.toHaveBeenCalled()
   })
 
   it('does not publish Flutter packages directly', async () => {
     await publishRelease({ ...release, type: 'flutter' })
 
+    expect(getExecOutput).not.toHaveBeenCalled()
     expect(exec).not.toHaveBeenCalled()
   })
 })

@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
   inputs: { mode: 'single' } as Record<string, string>,
   getInput: vi.fn((name: string) => mocks.inputs[name] || ''),
   getLatestTag: vi.fn(),
+  hasRelease: vi.fn(),
   getPullRequestFiles: vi.fn(),
   getPullRequestReleaseDirs: vi.fn(),
   getTagChangelog: vi.fn(),
@@ -56,6 +57,7 @@ vi.mock('../src/utils/github', () => ({
     addComment: mocks.addComment,
     createRelease: mocks.createRelease,
     getPullRequestFiles: mocks.getPullRequestFiles,
+    hasRelease: mocks.hasRelease,
   }),
 }))
 vi.mock('../src/utils/translate', () => ({ translateText: vi.fn() }))
@@ -95,6 +97,7 @@ describe('pull_request single mode', () => {
     mocks.getLatestTag.mockResolvedValue('1.0.0')
     mocks.getTagChangelog.mockResolvedValue('### 🚀 Features\n')
     mocks.createRelease.mockResolvedValue(undefined)
+    mocks.hasRelease.mockResolvedValue(false)
   })
 
   it('uses the latest stable tag for a stable release', async () => {
@@ -154,6 +157,7 @@ describe('pull_request single mode', () => {
 
     await pull_request('token')
 
+    expect(mocks.publishRelease).toHaveBeenCalledWith(expect.objectContaining({ name: 'pkg-a' }), true)
     expect(mocks.createRelease).toHaveBeenCalledWith(
       '1.1.0-beta.1',
       '1.1.0-beta.1',
@@ -170,12 +174,22 @@ describe('pull_request single mode', () => {
     await expect(pull_request('token')).rejects.toThrow('release failed')
   })
 
-  it('keeps the monorepo release failure behavior', async () => {
+  it('fails when a monorepo release cannot be created', async () => {
     mocks.inputs.mode = 'monorepo'
     mocks.context.payload = pullRequestPayload('closed')
     mocks.getPullRequestReleaseDirs.mockReturnValue([{ ...baseRelease, changelog: '## changelog' }])
     mocks.createRelease.mockRejectedValue(new Error('release failed'))
 
-    await expect(pull_request('token')).resolves.toBeUndefined()
+    await expect(pull_request('token')).rejects.toThrow('release failed')
+  })
+
+  it('skips a GitHub release that already exists', async () => {
+    mocks.context.payload = pullRequestPayload('closed')
+    mocks.getPullRequestReleaseDirs.mockReturnValue([{ ...baseRelease, changelog: '## changelog' }])
+    mocks.hasRelease.mockResolvedValue(true)
+
+    await pull_request('token')
+
+    expect(mocks.createRelease).not.toHaveBeenCalled()
   })
 })

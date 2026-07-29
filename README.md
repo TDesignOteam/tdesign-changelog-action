@@ -1,8 +1,8 @@
-# FlowPilot
+# tdesign-changelog-action
 
-FlowPilot 是用于 monorepo 和单仓发布流程的 GitHub Action。它从 PR 描述中收集 Changelog，在 release PR 中生成发布日志，并在 release PR 合并后发布 Node 包或创建 GitHub Release/tag。
+tdesign-changelog-action 是用于 monorepo 和单仓发布流程的 GitHub Action。它从 PR 描述中收集 Changelog，在 release PR 中生成发布日志，并在 release PR 合并后发布 Node 包或创建 GitHub Release/tag。
 
-FlowPilot 支持包含 `package.json` 的 Node 包和包含 `pubspec.yaml` 的 Flutter 包。版本更新、`release/*` 分支及 release PR 需要由 Changesets、自有脚本或其他发布工具创建，FlowPilot 不负责修改包版本或创建 release PR。
+tdesign-changelog-action 支持包含 `package.json` 的 Node 包和包含 `pubspec.yaml` 的 Flutter 包。版本更新、`release/*` 分支及 release PR 需要由 Changesets、自有脚本或其他发布工具创建，tdesign-changelog-action 不负责修改包版本或创建 release PR。
 
 ## 功能概览
 
@@ -19,7 +19,7 @@ FlowPilot 支持包含 `package.json` 的 Node 包和包含 `pubspec.yaml` 的 F
 
 ### `auto-changelog.yml`
 
-Review 通过时上传 PR 编号；release PR 打开或 PR 评论发生变化时，直接运行 FlowPilot。
+Review 通过时上传 PR 编号；release PR 打开或 PR 评论发生变化时，直接运行 tdesign-changelog-action。
 
 ```yaml
 name: auto-changelog
@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: auto-changelog
-        uses: TDesignOteam/flow-pilot-action@develop
+        uses: TDesignOteam/tdesign-changelog-action@develop
         with:
           token: ${{ secrets.TDESIGN_BOT_TOKEN }}
           packages: 'tdesign-miniprogram,@tdesign/uniapp,@tdesign/uniapp-chat'
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: auto-changelog
-        uses: TDesignOteam/flow-pilot-action@develop
+        uses: TDesignOteam/tdesign-changelog-action@develop
         with:
           token: ${{ secrets.TDESIGN_BOT_TOKEN }}
           packages: 'tdesign-miniprogram,@tdesign/uniapp,@tdesign/uniapp-chat'
@@ -97,7 +97,7 @@ jobs:
         run: echo "id=$(cat pr-id.txt)" >> "$GITHUB_OUTPUT"
 
       - name: auto-changelog
-        uses: TDesignOteam/flow-pilot-action@develop
+        uses: TDesignOteam/tdesign-changelog-action@develop
         with:
           token: ${{ secrets.TDESIGN_BOT_TOKEN }}
           packages: 'tdesign-miniprogram,@tdesign/uniapp,@tdesign/uniapp-chat'
@@ -144,7 +144,7 @@ jobs:
         with:
           node-version: 24
 
-      - uses: TDesignOteam/flow-pilot-action@develop
+      - uses: TDesignOteam/tdesign-changelog-action@develop
         with:
           token: ${{ secrets.TDESIGN_BOT_TOKEN }}
           packages: 'tdesign-miniprogram,@tdesign/uniapp,@tdesign/uniapp-chat'
@@ -169,11 +169,11 @@ jobs:
 
 | Output | 说明 |
 | --- | --- |
-| `changelog` | 普通 PR 打开且提取到日志时输出待确认的评论正文。FlowPilot 不会自动发布该评论，如需使用该模式，应由后续步骤消费 output 并创建评论。 |
+| `changelog` | 普通 PR 打开且提取到日志时输出待确认的评论正文。tdesign-changelog-action 不会自动发布该评论，如需使用该模式，应由后续步骤消费 output 并创建评论。 |
 
 ## 更新日志格式
 
-FlowPilot 从 PR 描述中的 `### 📝 更新日志` 区块提取日志。包名使用四级标题，日志项使用以下格式：
+tdesign-changelog-action 从 PR 描述中的 `### 📝 更新日志` 区块提取日志。包名使用四级标题，日志项使用以下格式：
 
 ```text
 type(scope): message
@@ -217,13 +217,13 @@ type(scope): message
 
 ## 确认与暂存
 
-普通 PR 打开后，FlowPilot 通过 `changelog` output 提供一条带提示行的待确认评论。可以通过以下任一方式确认日志：
+普通 PR 打开后，tdesign-changelog-action 通过 `changelog` output 提供一条带提示行的待确认评论。可以通过以下任一方式确认日志：
 
 1. 编辑待确认评论，检查日志内容并删除第一行提示，使评论以 `### 📝 更新日志` 开头。
 2. 由白名单成员在 PR 下创建内容为 `/changelog` 的评论。指令允许首尾空白，但不能包含其他内容；PR 已合并时会从目标分支创建补日志 PR。
 3. 由白名单成员提交状态为 `approved` 的 PR Review。
 
-通过 `/changelog` 或 Review 确认时，FlowPilot 从最新 PR 描述提取日志；编辑待确认评论时，以修改后的评论内容为准。随后 FlowPilot 向 PR 分支提交：
+通过 `/changelog` 或 Review 确认时，tdesign-changelog-action 从最新 PR 描述提取日志；编辑待确认评论时，以修改后的评论内容为准。随后 tdesign-changelog-action 向 PR 分支提交：
 
 ```text
 <package-dir>/.changelog/pr-<PR number>.md
@@ -231,7 +231,7 @@ type(scope): message
 
 暂存文件包含 PR 编号、贡献者、日志内容和 PR 链接，提交信息为 `chore: stash changelog [ci skip]`。重复确认同一 PR 会更新对应文件，不会创建多份日志。
 
-如果原 PR 已合并，FlowPilot 不再向原 head 分支推送，而是从原 PR 的 base 分支创建 `changelog/pr-<PR number>` 分支并提交补日志 PR。重复执行 `/changelog` 时，如果该补日志 PR 仍处于打开状态，则更新现有分支，不会重复创建 PR。该流程要求 token 具有 Contents 写权限和 Pull requests 写权限。
+如果原 PR 已合并，tdesign-changelog-action 不再向原 head 分支推送，而是从原 PR 的 base 分支创建 `changelog/pr-<PR number>` 分支并提交补日志 PR。重复执行 `/changelog` 时，如果该补日志 PR 仍处于打开状态，则更新现有分支，不会重复创建 PR。该流程要求 token 具有 Contents 写权限和 Pull requests 写权限。
 
 ### `/changelog` 指令限制
 
@@ -242,11 +242,11 @@ type(scope): message
 
 当前白名单固定读取 [Tencent/tdesign 的 `.pr-comment-ci-whitelist`](https://github.com/Tencent/tdesign/blob/main/.github/.pr-comment-ci-whitelist)，尚不支持通过 Action 参数或仓库文件配置。Review approved 和编辑确认评论同样受该白名单限制。
 
-编辑确认根据评论正文前缀识别，不校验评论是否由 FlowPilot 创建。以 `### 📝 更新日志`、`# 🎉 发布` 或 `# 🎉 Release` 开头的任意已编辑 PR 评论都可能触发对应流程，因此白名单应只包含可信维护者。
+编辑确认根据评论正文前缀识别，不校验评论是否由 tdesign-changelog-action 创建。以 `### 📝 更新日志`、`# 🎉 发布` 或 `# 🎉 Release` 开头的任意已编辑 PR 评论都可能触发对应流程，因此白名单应只包含可信维护者。
 
 ## 转换后的日志
 
-release PR 打开时，FlowPilot 读取各包的 `.changelog/*.md`，按类型分组；相同 scope 下存在多条日志时会生成二级列表。上面的 `pkg-a` 日志将转换为：
+release PR 打开时，tdesign-changelog-action 读取各包的 `.changelog/*.md`，按类型分组；相同 scope 下存在多条日志时会生成二级列表。上面的 `pkg-a` 日志将转换为：
 
 ```md
 ### 🚨 Breaking Changes
@@ -289,23 +289,23 @@ release PR 打开时，FlowPilot 读取各包的 `.changelog/*.md`，按类型�
 - fix(aa): aa
 ```
 
-设置 `mode: single` 后,release PR 打开时 FlowPilot 会:
+设置 `mode: single` 后,release PR 打开时 tdesign-changelog-action 会:
 
 1. 预发布版本取目标 ref 可达的最近 tag，稳定版取最近的非 alpha/beta tag；`from-tag` 可覆盖起点，目标历史无 tag 时扫描全部历史。release PR 的 base 分支(或 `to-tag`)作为终点。
 2. 分页获取区间内全部 commit，并关联出对应的已合并 PR 编号(去重)，兼容 merge、squash 和 rebase 合并。
 3. 逐个拉取 PR body,复用与普通 PR 相同的跳过规则(Bot / `skip-changelog` 标签 / release 分支 / 手动勾选),从 `### 📝 更新日志` 抓取日志。
 4. 拼接贡献者与 PR 链接,按类型分组渲染,生成与暂存模式完全一致的 `# 🎉 发布` / `# 🎉 Release` 确认评论;下游确认与 Release 创建流程不变。
 
-PR body 没有有效的 `type(scope): message` 日志且未显式跳过时，FlowPilot 会使用 PR 标题作为回退。符合该格式的标题会保留类型与 scope；其他标题自动归入 `Others`。模板中未勾选的“不需要纳入 Changelog”选项不视为有效日志。
+PR body 没有有效的 `type(scope): message` 日志且未显式跳过时，tdesign-changelog-action 会使用 PR 标题作为回退。符合该格式的标题会保留类型与 scope；其他标题自动归入 `Others`。模板中未勾选的“不需要纳入 Changelog”选项不视为有效日志。
 
-单仓模式下,release PR 合并后的 GitHub tag 使用纯版本号(如 `1.2.3`)而非 `${name}@${version}`。alpha/beta 会创建 GitHub prerelease，并生成相对最近 tag 的增量日志；稳定版会汇总最近稳定 tag 之后的完整日志。
+单仓模式下,release PR 合并后的 GitHub tag 使用纯版本号(如 `1.2.3`)而非 `${name}@${version}`。预发布版本会创建 GitHub prerelease，并生成相对最近 tag 的增量日志；稳定版会汇总最近稳定 tag 之后的完整日志。
 
 可通过 `package-json-path` 指定非根目录的 `package.json`,通过 `changelog-path` 指定自定义的 `CHANGELOG.md` 读写位置。
 
-所有触发 FlowPilot 的 workflow（release PR 打开、确认评论、release PR 关闭）必须传入相同的单仓配置，例如：
+所有触发 tdesign-changelog-action 的 workflow（release PR 打开、确认评论、release PR 关闭）必须传入相同的单仓配置，例如：
 
 ```yaml
-- uses: TDesignOteam/flow-pilot-action@develop
+- uses: TDesignOteam/tdesign-changelog-action@develop
   with:
     token: ${{ secrets.TDESIGN_BOT_TOKEN }}
     mode: single
@@ -326,13 +326,13 @@ PR body 没有有效的 `type(scope): message` 日志且未显式跳过时，Flo
 - 修改待发布包 manifest 中已有的 `version`。
 - 确保版本 manifest 在 PR 中属于 `modified` 文件，而不是新增文件。
 
-FlowPilot 根据 GitHub API 返回的 `package.json` 或 `pubspec.yaml` patch 识别待发布包和版本。版本包含 `alpha` 或 `beta` 时分别使用对应 dist-tag，其他版本当前均按 `latest` 处理。大型 diff 导致 GitHub 不返回 manifest patch 时，FlowPilot 无法识别该发布。
+tdesign-changelog-action 根据 GitHub API 返回的 `package.json` 或 `pubspec.yaml` patch 识别待发布包和版本。预发布版本使用首个 prerelease 标识符作为 dist-tag，例如 `alpha`、`beta` 或 `rc`；稳定版本使用 `latest`。大型 diff 导致 GitHub 不返回 manifest patch 时，tdesign-changelog-action 会终止发布。
 
 ### 2. 确认 release 日志
 
-release PR 打开后，FlowPilot 为 monorepo 的 `latest` 版本以及单仓的所有版本生成以 `# 🎉 发布` 开头的中文确认评论。配置两个翻译参数后，还会生成以 `# 🎉 Release` 开头的英文评论。
+release PR 打开后，tdesign-changelog-action 为 monorepo 的 `latest` 版本以及单仓的所有版本生成以 `# 🎉 发布` 开头的中文确认评论。配置两个翻译参数后，还会生成以 `# 🎉 Release` 开头的英文评论。
 
-检查评论内容并删除第一行提示后，FlowPilot 会：
+检查评论内容并删除第一行提示后，tdesign-changelog-action 会：
 
 - 删除该包的 `.changelog/*.md` 暂存文件。
 - 将中文内容写入 `CHANGELOG.md`，英文内容写入 `CHANGELOG.en-US.md`。
@@ -346,24 +346,24 @@ release PR 合并后，monorepo 各类包的处理方式如下：
 
 | 包类型 | Registry 发布 | GitHub Release/tag |
 | --- | --- | --- |
-| 公共 Node 包 | 执行 `pnpm publish --no-git-checks --filter <name> --tag <tag>` | 仅 `latest` 且存在非空 Changelog 时尝试创建 |
+| 公共 Node 包 | monorepo 执行 `pnpm publish --no-git-checks --filter <name> --tag <tag>`；单仓执行 `npm publish <package-dir> --tag <tag>` | 仅 `latest` 且存在非空 Changelog 时尝试创建 |
 | `private: true` 的 Node 包 | 跳过 | 仅 `latest` 且存在非空 Changelog 时尝试创建 |
-| 公共 Flutter 包 | FlowPilot 不执行 `flutter pub publish` | 所有版本均尝试创建 |
+| 公共 Flutter 包 | tdesign-changelog-action 不执行 `flutter pub publish` | 所有版本均尝试创建 |
 | `publish_to: none` 的 Flutter 包 | 跳过 | 所有版本均尝试创建 |
 
 GitHub Release 标题和 tag 均为 `${name}@${version}`。Flutter 包可使用该 tag 触发独立的 OIDC 发布工作流。
 
-`single` 模式下，所有版本均尝试创建纯版本号 GitHub Release/tag；alpha/beta 标记为 prerelease。Node registry 发布和私有包跳过规则保持不变。单仓 Release/tag 创建失败会使 workflow 失败，以避免后续版本缺少日志起始 tag。
+`single` 模式下，所有版本均尝试创建纯版本号 GitHub Release/tag；预发布版本标记为 prerelease。Node registry 发布和私有包跳过规则保持不变。Release/tag 创建失败会使 workflow 失败，以避免后续版本缺少日志起始 tag。
 
-Node 发布固定使用 pnpm 的 `--filter`，因此 Node monorepo 必须配置 pnpm workspace，并在运行 FlowPilot 前安装 pnpm；仅包含 Flutter 包时不需要 pnpm。
+Node monorepo 发布使用 pnpm 的 `--filter`，因此必须配置 pnpm workspace，并在运行 tdesign-changelog-action 前安装 pnpm。单仓 Node 发布使用 npm；仅包含 Flutter 包时不需要 pnpm。
 
-Registry 发布失败会使 workflow 失败；monorepo 创建 GitHub Release/tag 失败时只记录日志并继续处理其他包，单仓模式则会使 workflow 失败。
+Registry 发布或 GitHub Release/tag 创建失败都会使 workflow 失败。重跑时会跳过已经发布的包版本和已经存在的 GitHub Release/tag，并继续补齐未完成步骤。
 
-release PR 合并发布必须使用 `pull_request: closed`。FlowPilot 不支持 `pull_request_target`，避免由该事件创建的 Release/tag 导致后续 OIDC 发布被拒绝。
+release PR 合并发布必须使用 `pull_request: closed`。tdesign-changelog-action 不支持 `pull_request_target`，避免由该事件创建的 Release/tag 导致后续 OIDC 发布被拒绝。
 
 ## 包发现规则
 
-FlowPilot 会递归查找 `package.json` 和 `pubspec.yaml`，包发现本身不依赖 `pnpm-workspace.yaml`：
+tdesign-changelog-action 会递归查找 `package.json` 和 `pubspec.yaml`，包发现本身不依赖 `pnpm-workspace.yaml`：
 
 - 如果发现嵌套包，则忽略仓库根目录的 manifest；没有嵌套包时，根 manifest 作为单包处理。
 - 忽略 `.git`、`node_modules`、`dist`、`build`、`coverage`、`example`、`examples`、`.dart_tool` 和 `.pub-cache` 等目录。
@@ -372,7 +372,7 @@ FlowPilot 会递归查找 `package.json` 和 `pubspec.yaml`，包发现本身不
 - manifest 必须包含非空字符串 `name`。
 - `packages` 参数按包名精确过滤。未知包名可能出现在普通 PR 的预览评论中，但确认时不会写入暂存文件，因此应在接入时校验包名。
 
-当前不需要 `.flow-pilot.json`，FlowPilot 也不会读取该文件。
+当前不需要 `.tdesign-changelog.json`，tdesign-changelog-action 也不会读取该文件。
 
 ## 支持的事件
 

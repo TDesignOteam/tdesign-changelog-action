@@ -3,8 +3,8 @@ pr_number: 7
 contributor: liweijie0812
 ---
 
-- chore(Hook): add Hook @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- other(utils): add `isBoolean` function @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- chore: a chore log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- other: a other log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
-- fix(card): fix card bug @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- chore(Hook): add Hook @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- other(utils): add `isBoolean` function @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- chore: a chore log @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- other: a other log @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- fix(card): fix card bug @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))

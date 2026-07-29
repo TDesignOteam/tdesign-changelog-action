@@ -7,7 +7,7 @@ import { getPackages } from '../src/utils/get-packages'
 const tempDirs: string[] = []
 
 function createTempDir() {
-  const dir = mkdtempSync(join(tmpdir(), 'flow-pilot-packages-'))
+  const dir = mkdtempSync(join(tmpdir(), 'tdesign-changelog-packages-'))
   tempDirs.push(dir)
   return dir
 }
