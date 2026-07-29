@@ -1,0 +1,334 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`utils > extractChangelog > all 日志应用到所有包 1`] = `
+{
+  "pkg-a": [
+    "feat(Button): New Component",
+    "chore(utils): add \`isString\` function",
+  ],
+  "pkg-b": [
+    "feat(Button): New Component",
+    "chore(utils): add \`isString\` function",
+    "fix(link): fix link",
+  ],
+  "pkg-c": [
+    "feat(Button): New Component",
+    "chore(utils): add \`isString\` function",
+  ],
+}
+`;
+
+exports[`utils > extractChangelog > repo1 pkg-b是私有包，不收集日志 1`] = `
+{
+  "pkg-a": [
+    "feat(Button): New Component",
+    "feat(Hook): add renderNodeJSX",
+    "feat(Hook): add renderIcon",
+    "feat(useChat): add useChat",
+  ],
+  "pkg-b": [
+    "chore(utils): add \`isString\` function",
+  ],
+  "pkg-c": [
+    "feat(Button): New Component",
+  ],
+}
+`;
+
+exports[`utils > extractChangelog > repo2 无私有包 1`] = `
+{
+  "pkg-a": [
+    "feat(Button): New Component",
+    "feat(Hook): add renderNodeJSX",
+    "feat(Hook): add renderIcon",
+    "feat(useChat): add useChat",
+  ],
+  "pkg-b": [
+    "chore(utils): add \`isString\` function",
+  ],
+  "pkg-c": [
+    "feat(Button): New Component",
+  ],
+}
+`;
+
+exports[`utils > extractReleaseLog 1`] = `
+{
+  "changelog": "## 🌈 1.0.1 \`2025-4-7\`
+
+### 🚀 Features
+
+- Button:
+  - 新增属性c @liweijie0812 ([#4](https://github.com/liweijie0812/test-mono-log/pull/4))
+  - 新增属性a,新增属性b @liweijie0812 ([#2](https://github.com/liweijie0812/test-mono-log/pull/2))
+- Link: 新增属性c @liweijie0812 ([#2](https://github.com/liweijie0812/test-mono-log/pull/2))
+
+### 🐞 Bug Fixes
+
+- Button: 修复属性b @liweijie0812 ([#4](https://github.com/liweijie0812/test-mono-log/pull/4))
+
+",
+  "pkgName": "pkg-a",
+}
+`;
+
+exports[`utils > extractReleaseLogs (merged) 1`] = `
+[
+  {
+    "changelog": "## 🌈 1.0.1 \`2025-4-7\`
+
+### 🚀 Features
+
+- Button:
+  - 新增属性c @liweijie0812 ([#4](https://github.com/liweijie0812/test-mono-log/pull/4))
+  - 新增属性a,新增属性b @liweijie0812 ([#2](https://github.com/liweijie0812/test-mono-log/pull/2))
+- Link: 新增属性c @liweijie0812 ([#2](https://github.com/liweijie0812/test-mono-log/pull/2))
+
+### 🐞 Bug Fixes
+
+- Button: 修复属性b @liweijie0812 ([#4](https://github.com/liweijie0812/test-mono-log/pull/4))
+
+",
+    "pkgName": "pkg-a",
+  },
+  {
+    "changelog": "## 🌈 2.0.0 \`2025-4-7\`
+
+### 🚀 Features
+
+- Input:
+  - 新增 size 属性 @liweijie0812 ([#5](https://github.com/liweijie0812/test-mono-log/pull/5))
+
+### 🐞 Bug Fixes
+
+- Select: 修复禁用态样式 @liweijie0812 ([#6](https://github.com/liweijie0812/test-mono-log/pull/6))
+
+",
+    "pkgName": "pkg-b",
+  },
+  {
+    "changelog": "## 🌈 3.0.0 \`2025-4-7\`
+
+### 📝 Documentation
+
+- 更新 README @liweijie0812 ([#7](https://github.com/liweijie0812/test-mono-log/pull/7))
+
+",
+    "pkgName": "pkg-c",
+  },
+]
+`;
+
+exports[`utils > getMergedPullRequestReleaseDirs 1`] = `
+[
+  {
+    "changelog": "## 🌈 1.0.1 \`2025-4-7\`
+### 🚀 Features
+- Button:
+  - 新增属性c @liweijie0812 ([#4](https://github.com/liweijie0812/test-mono-log/pull/4))
+  - 新增属性a,新增属性b @liweijie0812 ([#2](https://github.com/liweijie0812/test-mono-log/pull/2))
+- Link: 新增属性c @liweijie0812 ([#2](https://github.com/liweijie0812/test-mono-log/pull/2))
+
+### 🐞 Bug Fixes
+- Button: 修复属性b @liweijie0812 ([#4](https://github.com/liweijie0812/test-mono-log/pull/4))
+
+",
+    "dir": "fixtures/repo1/packages/pkg-a",
+    "name": "pkg-a",
+    "oldVersion": "1.0.0",
+    "private": false,
+    "tag": "latest",
+    "type": "node",
+    "version": "1.0.1",
+  },
+  {
+    "changelog": "",
+    "dir": "fixtures/repo1/packages/pkg-c",
+    "name": "pkg-c",
+    "oldVersion": "1.0.0",
+    "private": false,
+    "tag": "latest",
+    "type": "node",
+    "version": "1.0.1",
+  },
+]
+`;
+
+exports[`utils > getMergedPullRequestReleaseDirs 2`] = `
+[
+  {
+    "changelog": "## 🌈 1.0.1 \`2025-4-7\`
+### 🚀 Features
+- Button:
+  - 新增属性c @liweijie0812 ([#4](https://github.com/liweijie0812/test-mono-log/pull/4))
+  - 新增属性a,新增属性b @liweijie0812 ([#2](https://github.com/liweijie0812/test-mono-log/pull/2))
+- Link: 新增属性c @liweijie0812 ([#2](https://github.com/liweijie0812/test-mono-log/pull/2))
+
+### 🐞 Bug Fixes
+- Button: 修复属性b @liweijie0812 ([#4](https://github.com/liweijie0812/test-mono-log/pull/4))
+
+",
+    "dir": "fixtures/repo1/packages/pkg-a",
+    "name": "pkg-a",
+    "oldVersion": "1.0.0",
+    "private": false,
+    "tag": "latest",
+    "type": "node",
+    "version": "1.0.1",
+  },
+  {
+    "changelog": "",
+    "dir": "fixtures/repo1/packages/pkg-c",
+    "name": "pkg-c",
+    "oldVersion": "1.0.0",
+    "private": false,
+    "tag": "latest",
+    "type": "node",
+    "version": "1.0.1",
+  },
+]
+`;
+
+exports[`utils > getMergedPullRequestReleaseDirs 3`] = `
+[
+  {
+    "changelog": "## 🌈 1.0.1 \`2025-4-7\`
+### 🚀 Features
+- Button:
+  - 新增属性c @liweijie0812 ([#4](https://github.com/liweijie0812/test-mono-log/pull/4))
+  - 新增属性a,新增属性b @liweijie0812 ([#2](https://github.com/liweijie0812/test-mono-log/pull/2))
+- Link: 新增属性c @liweijie0812 ([#2](https://github.com/liweijie0812/test-mono-log/pull/2))
+
+### 🐞 Bug Fixes
+- Button: 修复属性b @liweijie0812 ([#4](https://github.com/liweijie0812/test-mono-log/pull/4))
+
+
+---
+### 🚀 Features
+- Button:
+  - Added prop c @liweijie0812 ([#4](https://github.com/liweijie0812/test-mono-log/pull/4))
+  - Added prop a, added prop b @liweijie0812 ([#2](https://github.com/liweijie0812/test-mono-log/pull/2))
+- Link: Added prop c @liweijie0812 ([#2](https://github.com/liweijie0812/test-mono-log/pull/2))
+
+### 🐞 Bug Fixes
+- Button: Fixed prop b @liweijie0812 ([#4](https://github.com/liweijie0812/test-mono-log/pull/4))
+
+",
+    "dir": "fixtures/repo1/packages/pkg-a",
+    "name": "pkg-a",
+    "oldVersion": "1.0.0",
+    "private": false,
+    "tag": "latest",
+    "type": "node",
+    "version": "1.0.1",
+  },
+  {
+    "changelog": "",
+    "dir": "fixtures/repo1/packages/pkg-c",
+    "name": "pkg-c",
+    "oldVersion": "1.0.0",
+    "private": false,
+    "tag": "latest",
+    "type": "node",
+    "version": "1.0.1",
+  },
+]
+`;
+
+exports[`utils > getStashChangelog 1`] = `
+{
+  "changelogs": [
+    "- feat(Button): New Component @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
+    "- feat(Hook): add renderNodeJSX @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
+    "- feat(Hook): add renderIcon @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
+    "- feat(useChat): add useChat @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
+    "- chore(Hook): add Hook @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
+    "- other(utils): add \`isBoolean\` function @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
+    "- chore: a chore log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
+    "- other: a other log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
+    "- fix(card): fix card bug @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))",
+  ],
+  "pkg": "pkg-a",
+  "version": "1.0.0",
+}
+`;
+
+exports[`utils > renderChangelogMarkdown 1`] = `
+"### 🚀 Features
+
+- \`Button\`: New Component @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- \`Hook\`: 
+  - add renderNodeJSX @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+  - add renderIcon @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- \`useChat\`: add useChat @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+
+### 🐞 Bug Fixes
+
+- \`Card\`: fix card bug @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+
+### 🚧 Others
+
+- a chore log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- a other log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- \`Hook\`: add Hook @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- \`Utils\`: add \`isBoolean\` function @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+"
+`;
+
+exports[`utils > stashPackageChangelog > stashPackageChangelog1 1`] = `
+"---
+pr_number: 6
+contributor: liweijie0812
+---
+
+- feat(Button): New Component @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- feat(Hook): add renderNodeJSX @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- feat(Hook): add renderIcon @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- feat(useChat): add useChat @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+"
+`;
+
+exports[`utils > stashPackageChangelog > stashPackageChangelog1 2`] = `
+"---
+pr_number: 6
+contributor: liweijie0812
+---
+
+- chore(utils): add \`isString\` function @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+"
+`;
+
+exports[`utils > stashPackageChangelog > stashPackageChangelog1 3`] = `
+"---
+pr_number: 6
+contributor: liweijie0812
+---
+
+- feat(Button): New Component @liweijie0812 ([#6](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+"
+`;
+
+exports[`utils > stashPackageChangelog > stashPackageChangelog2 1`] = `
+"---
+pr_number: 7
+contributor: liweijie0812
+---
+
+- chore(Hook): add Hook @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- other(utils): add \`isBoolean\` function @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- chore: a chore log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- other: a other log @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- fix(card): fix card bug @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+"
+`;
+
+exports[`utils > stashPackageChangelog > stashPackageChangelog2 2`] = `
+"---
+pr_number: 7
+contributor: liweijie0812
+---
+
+- other(utils): add \`isBoolean\` function @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+- fix(Button): fix Button @liweijie0812 ([#7](https://github.com/TDesignOteam/flow-pilot-action/pull/6))
+"
+`;

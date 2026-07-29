@@ -1,0 +1,4 @@
+{
+  "extends": ["github>TDesignOteam/tdesign-renovate-config:presets.json5"],
+  "ignorePaths": ["fixtures/**"]
+}
