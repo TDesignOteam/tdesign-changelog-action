@@ -31496,7 +31496,7 @@ function useGit(token) {
 		await exec("git", [
 			"config",
 			"--global",
-			`url.https://${token}@github.com/.insteadOf`,
+			`url.https://x-access-token:${token}@github.com/.insteadOf`,
 			"https://github.com/"
 		]);
 		const repo_url = `https://github.com/${owner}/${repo}.git`;
