@@ -291,7 +291,7 @@ release PR 打开时，tdesign-changelog-action 读取各包的 `.changelog/*.md
 
 设置 `mode: single` 后,release PR 打开时 tdesign-changelog-action 会:
 
-1. 预发布版本取目标 ref 可达的最近 tag，稳定版取最近的非 alpha/beta tag；`from-tag` 可覆盖起点，目标历史无 tag 时扫描全部历史。release PR 的 base 分支(或 `to-tag`)作为终点。
+1. 通过 GitHub API 读取 manifest 和 tag，无需 clone/checkout 仓库。预发布版本取目标 ref 可达的最近 tag，稳定版取最近的非 alpha/beta tag；`from-tag` 可覆盖起点，目标历史无 tag 时扫描全部历史。release PR 的 base 分支(或 `to-tag`)作为终点。
 2. 分页获取区间内全部 commit，并关联出对应的已合并 PR 编号(去重)，兼容 merge、squash 和 rebase 合并。
 3. 逐个拉取 PR body,复用与普通 PR 相同的跳过规则(Bot / `skip-changelog` 标签 / release 分支 / 手动勾选),从 `### 📝 更新日志` 抓取日志。
 4. 拼接贡献者与 PR 链接,按类型分组渲染,生成与暂存模式完全一致的 `# 🎉 发布` / `# 🎉 Release` 确认评论;下游确认与 Release 创建流程不变。

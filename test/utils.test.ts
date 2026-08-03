@@ -166,6 +166,18 @@ describe('utils', () => {
     expect(paths[1].tag).toBe('latest')
   })
 
+  it('reads and filters a release manifest from supplied repository content', () => {
+    const file = {
+      filename: 'package.json',
+      status: 'modified',
+      patch: '@@ -2,3 +2,3 @@\n-  "version": "1.0.0",\n+  "version": "1.1.0",',
+    } as any
+
+    expect(getPullRequestReleaseDirs([file], undefined, {
+      'package.json': '{"name":"pkg-a","version":"1.1.0"}',
+    })).toMatchObject([{ name: 'pkg-a', version: '1.1.0' }])
+  })
+
   it('associates a configured changelog path with the single package release', () => {
     process.env.INPUT_MODE = 'single'
     process.env['INPUT_CHANGELOG-PATH'] = 'docs/RELEASES.md'

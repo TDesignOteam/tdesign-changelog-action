@@ -283,15 +283,15 @@ function getChangedVersions(patch: string, type: PackageType) {
   }
 }
 
-function readPackageManifest(path: string, type: PackageType): Record<string, unknown> {
-  const content = readFileSync(path, 'utf8')
+function readPackageManifest(path: string, type: PackageType, manifestContents?: Record<string, string>): Record<string, unknown> {
+  const content = manifestContents?.[path] ?? readFileSync(path, 'utf8')
   const data = type === 'node' ? JSON.parse(content) : parse(content)
   if (!data || typeof data !== 'object')
     throw new Error(`Package manifest "${path}" must contain an object`)
   return data
 }
 
-export function getPullRequestReleaseDirs(prFiles: PullRequestFiles, packages?: Package[]): ReleasePackage[] {
+export function getPullRequestReleaseDirs(prFiles: PullRequestFiles, packages?: Package[], manifestContents?: Record<string, string>): ReleasePackage[] {
   const zhChangelogs: Record<string, string> = {}
   const enChangelogs: Record<string, string> = {}
   const customChangelogPath = isSingleMode() ? core.getInput('changelog-path', { trimWhitespace: true }).replace(/^\.\//, '') : ''
@@ -359,6 +359,9 @@ export function getPullRequestReleaseDirs(prFiles: PullRequestFiles, packages?: 
     if (!type) {
       return false
     }
+    if (manifestContents && !(file.filename in manifestContents)) {
+      return false
+    }
     if (packages && !packages.some(pkg => pkg.type === type && pkg.dir === resolve(dirname(file.filename)))) {
       return false
     }
@@ -379,7 +382,7 @@ export function getPullRequestReleaseDirs(prFiles: PullRequestFiles, packages?: 
     return true
   }).map((file) => {
     const type = getManifestType(file.filename) as PackageType
-    const packageData = readPackageManifest(file.filename, type)
+    const packageData = readPackageManifest(file.filename, type, manifestContents)
     const { newVersion: version, oldVersion } = getChangedVersions(file.patch || '', type)
     if (typeof packageData.name !== 'string')
       throw new Error(`Package manifest "${file.filename}" is missing a valid "name" field`)

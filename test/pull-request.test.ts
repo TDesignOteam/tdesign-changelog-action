@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
   inputs: { mode: 'single' } as Record<string, string>,
   getInput: vi.fn((name: string) => mocks.inputs[name] || ''),
   getLatestTag: vi.fn(),
+  getRepositoryFile: vi.fn(),
   hasRelease: vi.fn(),
   getPullRequestFiles: vi.fn(),
   getPullRequestReleaseDirs: vi.fn(),
@@ -57,6 +58,8 @@ vi.mock('../src/utils/github', () => ({
     addComment: mocks.addComment,
     createRelease: mocks.createRelease,
     getPullRequestFiles: mocks.getPullRequestFiles,
+    getLatestTag: mocks.getLatestTag,
+    getRepositoryFile: mocks.getRepositoryFile,
     hasRelease: mocks.hasRelease,
   }),
 }))
@@ -79,7 +82,7 @@ function pullRequestPayload(action: 'opened' | 'closed') {
     number: 42,
     pull_request: {
       base: { ref: 'main', repo: { full_name: 'owner/repo' } },
-      head: { ref: 'release/1.1.0', repo: { full_name: 'owner/repo' } },
+      head: { ref: 'release/1.1.0', sha: 'head-sha', repo: { full_name: 'owner/repo' } },
       merge_commit_sha: action === 'closed' ? 'merge-sha' : undefined,
       merged: action === 'closed',
     },
@@ -95,6 +98,7 @@ describe('pull_request single mode', () => {
     mocks.getPullRequestFiles.mockResolvedValue([])
     mocks.getPullRequestReleaseDirs.mockReturnValue([baseRelease])
     mocks.getLatestTag.mockResolvedValue('1.0.0')
+    mocks.getRepositoryFile.mockResolvedValue('{"name":"pkg-a","version":"1.1.0"}')
     mocks.getTagChangelog.mockResolvedValue('### 🚀 Features\n')
     mocks.createRelease.mockResolvedValue(undefined)
     mocks.hasRelease.mockResolvedValue(false)
@@ -103,6 +107,9 @@ describe('pull_request single mode', () => {
   it('uses the latest stable tag for a stable release', async () => {
     await pull_request('token')
 
+    expect(mocks.cloneRepo).not.toHaveBeenCalled()
+    expect(mocks.checkoutBranch).not.toHaveBeenCalled()
+    expect(mocks.getRepositoryFile).toHaveBeenCalledWith('package.json', 'head-sha')
     expect(mocks.getLatestTag).toHaveBeenCalledWith('main', true)
     expect(mocks.getTagChangelog).toHaveBeenCalledWith('token', ['pkg-a'], '1.0.0', 'main')
   })

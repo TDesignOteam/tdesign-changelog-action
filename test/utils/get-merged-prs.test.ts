@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import useGithub from '../../src/utils/github'
@@ -6,8 +7,10 @@ const octokit = vi.hoisted(() => {
   const rest = {
     repos: {
       compareCommitsWithBasehead: vi.fn(),
+      getContent: vi.fn(),
       listCommits: vi.fn(),
       listPullRequestsAssociatedWithCommit: vi.fn(),
+      listTags: vi.fn(),
     },
   }
   return {
@@ -115,5 +118,49 @@ describe('getMergedPrNumbersBetweenRefs', () => {
       1,
       expect.objectContaining({ commit_sha: 'old' }),
     )
+  })
+})
+
+describe('repository tag and file APIs', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('finds the first reachable stable tag', async () => {
+    octokit.rest.repos.listTags.mockResolvedValue({
+      data: [{ name: '2.0.0-beta.1' }, { name: '1.5.0' }, { name: '1.0.0' }],
+    })
+    octokit.rest.repos.compareCommitsWithBasehead.mockResolvedValue({ data: { status: 'ahead' } })
+
+    const { getLatestTag } = useGithub('token')
+
+    await expect(getLatestTag('main', true)).resolves.toBe('1.5.0')
+    expect(octokit.rest.repos.compareCommitsWithBasehead).toHaveBeenCalledWith(
+      expect.objectContaining({ basehead: '1.5.0...main' }),
+    )
+  })
+
+  it('skips tags that are not reachable from the target ref', async () => {
+    octokit.rest.repos.listTags.mockResolvedValue({
+      data: [{ name: '2.0.0' }, { name: '1.0.0' }],
+    })
+    octokit.rest.repos.compareCommitsWithBasehead
+      .mockResolvedValueOnce({ data: { status: 'diverged' } })
+      .mockResolvedValueOnce({ data: { status: 'identical' } })
+
+    const { getLatestTag } = useGithub('token')
+
+    await expect(getLatestTag('maintenance')).resolves.toBe('1.0.0')
+  })
+
+  it('reads repository files without a checkout', async () => {
+    octokit.rest.repos.getContent.mockResolvedValue({
+      data: { type: 'file', encoding: 'base64', content: Buffer.from('{"name":"pkg"}').toString('base64') },
+    })
+
+    const { getRepositoryFile } = useGithub('token')
+
+    await expect(getRepositoryFile('package.json', 'head-sha')).resolves.toBe('{"name":"pkg"}')
+    expect(octokit.rest.repos.getContent).toHaveBeenCalledWith(expect.objectContaining({ path: 'package.json', ref: 'head-sha' }))
   })
 })

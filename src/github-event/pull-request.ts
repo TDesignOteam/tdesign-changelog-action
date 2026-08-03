@@ -41,21 +41,31 @@ export async function pull_request(token: string) {
 
     if (isRelease && !isForkPr && github.context.payload.action === 'opened') {
       const prNumber = getPullRequestNumber()
-      const { addComment, getPullRequestFiles } = useGithub(token)
-      const { cloneRepo, checkoutBranch, getLatestTag } = useGit(token)
-      await cloneRepo()
-      await checkoutBranch(pullRequestData.head.ref)
+      const useTagChangelog = isSingleMode()
+      const { addComment, getLatestTag, getPullRequestFiles, getRepositoryFile } = useGithub(token)
+      if (!useTagChangelog) {
+        const { cloneRepo, checkoutBranch } = useGit(token)
+        await cloneRepo()
+        await checkoutBranch(pullRequestData.head.ref)
+      }
       const changeFiles = await getPullRequestFiles(prNumber)
       info(`changeFiles: ${JSON.stringify(changeFiles, null, 2)}`)
-      const configuredPackages = getConfiguredPackages(cwd())
-      const releaseDirs = await getPullRequestReleaseDirs(changeFiles, configuredPackages)
+      let releaseDirs
+      if (useTagChangelog) {
+        const manifestPath = (getInput('package-json-path', { trimWhitespace: true }) || 'package.json').replace(/^\.\//, '')
+        const manifestContent = await getRepositoryFile(manifestPath, pullRequestData.head.sha)
+        releaseDirs = getPullRequestReleaseDirs(changeFiles, undefined, { [manifestPath]: manifestContent })
+      }
+      else {
+        const configuredPackages = getConfiguredPackages(cwd())
+        releaseDirs = getPullRequestReleaseDirs(changeFiles, configuredPackages)
+      }
       info(`releaseDirs: ${JSON.stringify(releaseDirs, null, 2)}`)
       setOutput('changelog', '')
       if (!releaseDirs.length) {
         info('没有更新发布版本')
         return
       }
-      const useTagChangelog = isSingleMode()
       const zhComments: string[] = []
       const enComments: string[] = []
       const logHead = '(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的 CHANGELOG.md 文件中\n'

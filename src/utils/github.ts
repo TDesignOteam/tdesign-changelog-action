@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
@@ -107,6 +108,39 @@ export default function useGithub(token: string) {
     }
   }
 
+  async function getRepositoryFile(path: string, ref: string) {
+    const { data } = await octokit.rest.repos.getContent({ owner, repo, path, ref })
+    if (Array.isArray(data) || data.type !== 'file' || !('content' in data) || !data.content)
+      throw new Error(`Repository file "${path}" is unavailable at ref "${ref}"`)
+    return Buffer.from(data.content, data.encoding === 'base64' ? 'base64' : 'utf8').toString('utf8')
+  }
+
+  async function getLatestTag(ref: string, stableOnly = false) {
+    const tags = await octokit.paginate(octokit.rest.repos.listTags, {
+      owner,
+      repo,
+      per_page: 100,
+    })
+    const candidates = stableOnly
+      ? tags.filter(tag => !/alpha|beta/i.test(tag.name))
+      : tags
+
+    for (const tag of candidates) {
+      try {
+        const { data } = await octokit.rest.repos.compareCommitsWithBasehead({
+          owner,
+          repo,
+          basehead: `${tag.name}...${ref}`,
+        })
+        if (data.status === 'ahead' || data.status === 'identical')
+          return tag.name
+      }
+      catch (error) {
+        core.warning(`getLatestTag: 跳过 tag ${tag.name}: ${error instanceof Error ? error.message : String(error)}`)
+      }
+    }
+  }
+
   async function getCommitsBetweenRefs(base: string | undefined, head: string) {
     if (!base) {
       const commits = await octokit.paginate(octokit.rest.repos.listCommits, {
@@ -167,5 +201,5 @@ export default function useGithub(token: string) {
     return [...prNumbers]
   }
 
-  return { getPullRequestData, getPullRequestFiles, getOpenPullRequestByHead, createPullRequest, addPullRequestLabels, addComment, updateComment, getCommentList, getRequestedReviewers, createRelease, hasRelease, getMergedPrNumbersBetweenRefs }
+  return { getPullRequestData, getPullRequestFiles, getOpenPullRequestByHead, createPullRequest, addPullRequestLabels, addComment, updateComment, getCommentList, getRequestedReviewers, createRelease, hasRelease, getRepositoryFile, getLatestTag, getMergedPrNumbersBetweenRefs }
 }
