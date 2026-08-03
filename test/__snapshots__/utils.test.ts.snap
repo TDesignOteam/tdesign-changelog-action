@@ -1,5 +1,19 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`utils > extractChangelog > all 日志只分发给 body 中显式出现的包，缺少 heading 的包不获得 all 条目 1`] = `
+{
+  "pkg-a": [
+    "feat(Button): New Component",
+    "chore(utils): add \`isString\` function",
+  ],
+  "pkg-b": [],
+  "pkg-c": [
+    "feat(Button): New Component",
+    "chore(utils): add \`isString\` function",
+  ],
+}
+`;
+
 exports[`utils > extractChangelog > all 日志应用到所有包 1`] = `
 {
   "pkg-a": [
@@ -7,9 +21,9 @@ exports[`utils > extractChangelog > all 日志应用到所有包 1`] = `
     "chore(utils): add \`isString\` function",
   ],
   "pkg-b": [
+    "fix(link): fix link",
     "feat(Button): New Component",
     "chore(utils): add \`isString\` function",
-    "fix(link): fix link",
   ],
   "pkg-c": [
     "feat(Button): New Component",

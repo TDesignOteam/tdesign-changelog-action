@@ -102,6 +102,10 @@ export function extractChangelog(markdown: string, pkgNames: string[]) {
     pkgLogs[name] = []
   })
   let collectLogs = false
+  /** body 中出现的包名 heading（不含 `all`），用于限定 `all` 的分发范围 */
+  const mentionedPkgNames = new Set<string>()
+  /** 暂存 `all` 的列表项，两趟处理：先收集中出现的 heading，再分发 */
+  const allListItems: string[] = []
 
   md.forEach((token) => {
     if (token.type === changelogHeading.type && token.depth === changelogHeading.depth) {
@@ -110,18 +114,34 @@ export function extractChangelog(markdown: string, pkgNames: string[]) {
 
     if (collectLogs && token.type === 'heading' && token.depth === pkgDepth) {
       pkgName = token.text
+      if (pkgName !== 'all') {
+        mentionedPkgNames.add(pkgName)
+      }
     }
     if (collectLogs && token.type === 'list' && (pkgName === 'all' || pkgNames.includes(pkgName))) {
       const items = token.items as Tokens.ListItem[]
       items.forEach((item) => {
         if (item.type === 'list_item' && item.tokens.length) {
           const token = item.tokens[0] as Tokens.Text
-          const targetPkgNames = pkgName === 'all' ? pkgNames : [pkgName]
-          targetPkgNames.forEach(name => pkgLogs[name].push(token.text))
+          if (pkgName === 'all') {
+            allListItems.push(token.text)
+          }
+          else {
+            pkgLogs[pkgName].push(token.text)
+          }
         }
       })
     }
   })
+
+  // 第二趟：将 `all` 中暂存的条目分发到 body 中显式出现的包
+  if (allListItems.length) {
+    const targetPkgNames = mentionedPkgNames.size > 0 ? pkgNames.filter(n => mentionedPkgNames.has(n)) : pkgNames
+    allListItems.forEach((text) => {
+      targetPkgNames.forEach(name => pkgLogs[name].push(text))
+    })
+  }
+
   return pkgLogs
 }
 
@@ -497,6 +517,10 @@ function extractTagChangelogLogs(markdown: string, pkgNames: string[]): string[]
   let collectLogs = false
   let pkgName = ''
   const logs: string[] = []
+  /** body 中出现的包名 heading（不含 `all`），用于限定 `all` 的分发范围 */
+  const mentionedPkgNames = new Set<string>()
+  /** 暂存 `all` 的列表项 */
+  const allListItems: string[] = []
 
   md.forEach((token) => {
     if (token.type === changelogHeading.type && token.depth === changelogHeading.depth) {
@@ -510,6 +534,9 @@ function extractTagChangelogLogs(markdown: string, pkgNames: string[]): string[]
     if (token.type === 'heading') {
       if (token.depth === pkgDepth) {
         pkgName = token.text
+        if (pkgName !== 'all') {
+          mentionedPkgNames.add(pkgName)
+        }
       }
       else {
         // 离开更新日志区块
@@ -520,18 +547,34 @@ function extractTagChangelogLogs(markdown: string, pkgNames: string[]): string[]
     if (token.type === 'list') {
       const items = token.items as Tokens.ListItem[]
       if (pkgName === 'all' || pkgNames.includes(pkgName) || pkgName === '') {
-        const targetCount = pkgName === 'all' ? pkgNames.length : 1
-        items.forEach((item) => {
-          if (item.type === 'list_item' && item.tokens.length) {
-            const text = (item.tokens[0] as Tokens.Text).text
-            for (let i = 0; i < targetCount; i++) {
-              logs.push(text)
+        if (pkgName === 'all') {
+          items.forEach((item) => {
+            if (item.type === 'list_item' && item.tokens.length) {
+              allListItems.push((item.tokens[0] as Tokens.Text).text)
             }
-          }
-        })
+          })
+        }
+        else {
+          items.forEach((item) => {
+            if (item.type === 'list_item' && item.tokens.length) {
+              logs.push((item.tokens[0] as Tokens.Text).text)
+            }
+          })
+        }
       }
     }
   })
+
+  // 第二趟：将 `all` 中暂存的条目按实际出现的包数分发
+  if (allListItems.length) {
+    const targetCount = mentionedPkgNames.size > 0 ? pkgNames.filter(n => mentionedPkgNames.has(n)).length : pkgNames.length
+    allListItems.forEach((text) => {
+      for (let i = 0; i < targetCount; i++) {
+        logs.push(text)
+      }
+    })
+  }
+
   return logs
 }
 
