@@ -57,7 +57,7 @@ vi.mock('../src/utils/common', () => ({
   extractChangelog: mocks.extractChangelog,
   extractReleaseLogs: vi.fn().mockReturnValue([]),
   getChangelogFilePath: (release: { dir: string }, lang: 'zh' | 'en') => `${release.dir}/${lang === 'en' ? 'CHANGELOG.en-US.md' : 'CHANGELOG.md'}`,
-  getConfiguredPackages: () => [],
+  getConfiguredPackages: vi.fn().mockReturnValue([]),
   getInputPkgs: () => ['pkg-a'],
   getPrCommentWhitelist: mocks.getPrCommentWhitelist,
   getPullRequestNumber: () => 42,
@@ -133,6 +133,37 @@ describe('issue_comment', () => {
       { 'pkg-a': ['feat(Button): add loading state'] },
     )
     expect(mocks.cloneRepo).toHaveBeenCalledOnce()
+  })
+
+  it('passes actual disk packages (excluding deleted ones) to extractChangelog when \"all\" is used', async () => {
+    const { getConfiguredPackages } = await import('../src/utils/common')
+    // pkg-b 被删除，磁盘只剩下 pkg-a 和 pkg-c
+    vi.mocked(getConfiguredPackages).mockReturnValue([
+      { name: 'pkg-a', relativeDir: 'packages/pkg-a', type: 'node' as const },
+      { name: 'pkg-c', relativeDir: 'packages/pkg-c', type: 'node' as const },
+    ])
+
+    mocks.context.payload.comment.body = '  /changelog\n'
+
+    await expect(issue_comment('token')).resolves.toBe(true)
+
+    // 第一次调用（confirmPullRequestChangelog）仍然用 getInputPkgs() → ['pkg-a']
+    expect(mocks.extractChangelog).toHaveBeenNthCalledWith(1, prData.body, ['pkg-a'])
+    // 第二次调用（confirmChangelog 修复后）应使用磁盘实际存在的包名 → ['pkg-a', 'pkg-c']
+    expect(mocks.extractChangelog).toHaveBeenNthCalledWith(
+      2,
+      expect.any(String),
+      ['pkg-a', 'pkg-c'],
+    )
+    // stashPackageChangelog 也传入来自 getConfiguredPackages 的包列表
+    expect(mocks.stashPackageChangelog).toHaveBeenCalledWith(
+      prData,
+      [
+        { name: 'pkg-a', relativeDir: 'packages/pkg-a', type: 'node' },
+        { name: 'pkg-c', relativeDir: 'packages/pkg-c', type: 'node' },
+      ],
+      expect.any(Object),
+    )
   })
 
   it('ignores unrelated created comments before loading the whitelist', async () => {

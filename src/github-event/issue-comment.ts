@@ -78,9 +78,6 @@ export async function confirmChangelog(prNumber: number, log: string, token: str
   if (!log.startsWith('### 📝 更新日志')) {
     return false
   }
-  const changelog = extractChangelog(log || '', getInputPkgs())
-
-  core.info(`stash_changelog: ${JSON.stringify(changelog, null, 2)}`)
 
   const { createPullRequest, getOpenPullRequestByHead, getPullRequestData } = useGithub(token)
   const prData = await getPullRequestData(prNumber) as PullRequestData
@@ -115,6 +112,11 @@ export async function confirmChangelog(prNumber: number, log: string, token: str
   }
   const pkgs = getConfiguredPackages(cwd())
   core.info(`pkgs: ${JSON.stringify(pkgs, null, 2)}`)
+  const pkgNames = pkgs.map(p => p.name)
+  const changelog = extractChangelog(log || '', pkgNames.length ? pkgNames : getInputPkgs())
+
+  core.info(`stash_changelog: ${JSON.stringify(changelog, null, 2)}`)
+
   stashPackageChangelog(prData, pkgs, changelog)
   await exec('git', ['add', '**/pr-*.md'])
   await exec('git', ['status'])

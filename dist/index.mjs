@@ -31132,16 +31132,30 @@ function extractChangelog(markdown, pkgNames) {
 		pkgLogs[name] = [];
 	});
 	let collectLogs = false;
+	/** body 中出现的包名 heading（不含 `all`），用于限定 `all` 的分发范围 */
+	const mentionedPkgNames = /* @__PURE__ */ new Set();
+	/** 暂存 `all` 的列表项，两趟处理：先收集中出现的 heading，再分发 */
+	const allListItems = [];
 	md.forEach((token) => {
 		if (token.type === changelogHeading.type && token.depth === changelogHeading.depth) collectLogs = token.text === changelogHeading.text;
-		if (collectLogs && token.type === "heading" && token.depth === pkgDepth) pkgName = token.text;
+		if (collectLogs && token.type === "heading" && token.depth === pkgDepth) {
+			pkgName = token.text;
+			if (pkgName !== "all") mentionedPkgNames.add(pkgName);
+		}
 		if (collectLogs && token.type === "list" && (pkgName === "all" || pkgNames.includes(pkgName))) token.items.forEach((item) => {
 			if (item.type === "list_item" && item.tokens.length) {
 				const token = item.tokens[0];
-				(pkgName === "all" ? pkgNames : [pkgName]).forEach((name) => pkgLogs[name].push(token.text));
+				if (pkgName === "all") allListItems.push(token.text);
+				else pkgLogs[pkgName].push(token.text);
 			}
 		});
 	});
+	if (allListItems.length) {
+		const targetPkgNames = mentionedPkgNames.size > 0 ? pkgNames.filter((n) => mentionedPkgNames.has(n)) : pkgNames;
+		allListItems.forEach((text) => {
+			targetPkgNames.forEach((name) => pkgLogs[name].push(text));
+		});
+	}
 	return pkgLogs;
 }
 /**
@@ -31410,6 +31424,10 @@ function extractTagChangelogLogs(markdown, pkgNames) {
 	let collectLogs = false;
 	let pkgName = "";
 	const logs = [];
+	/** body 中出现的包名 heading（不含 `all`），用于限定 `all` 的分发范围 */
+	const mentionedPkgNames = /* @__PURE__ */ new Set();
+	/** 暂存 `all` 的列表项 */
+	const allListItems = [];
 	md.forEach((token) => {
 		if (token.type === changelogHeading.type && token.depth === changelogHeading.depth) {
 			collectLogs = token.text === changelogHeading.text;
@@ -31418,23 +31436,28 @@ function extractTagChangelogLogs(markdown, pkgNames) {
 		}
 		if (!collectLogs) return;
 		if (token.type === "heading") {
-			if (token.depth === pkgDepth) pkgName = token.text;
-			else collectLogs = false;
+			if (token.depth === pkgDepth) {
+				pkgName = token.text;
+				if (pkgName !== "all") mentionedPkgNames.add(pkgName);
+			} else collectLogs = false;
 			return;
 		}
 		if (token.type === "list") {
 			const items = token.items;
-			if (pkgName === "all" || pkgNames.includes(pkgName) || pkgName === "") {
-				const targetCount = pkgName === "all" ? pkgNames.length : 1;
-				items.forEach((item) => {
-					if (item.type === "list_item" && item.tokens.length) {
-						const text = item.tokens[0].text;
-						for (let i = 0; i < targetCount; i++) logs.push(text);
-					}
-				});
-			}
+			if (pkgName === "all" || pkgNames.includes(pkgName) || pkgName === "") if (pkgName === "all") items.forEach((item) => {
+				if (item.type === "list_item" && item.tokens.length) allListItems.push(item.tokens[0].text);
+			});
+			else items.forEach((item) => {
+				if (item.type === "list_item" && item.tokens.length) logs.push(item.tokens[0].text);
+			});
 		}
 	});
+	if (allListItems.length) {
+		const targetCount = mentionedPkgNames.size > 0 ? pkgNames.filter((n) => mentionedPkgNames.has(n)).length : pkgNames.length;
+		allListItems.forEach((text) => {
+			for (let i = 0; i < targetCount; i++) logs.push(text);
+		});
+	}
 	return logs;
 }
 function isRenderableChangelogLog(log) {
@@ -31668,8 +31691,6 @@ async function confirmPullRequestChangelog(prNumber, prData, token) {
 }
 async function confirmChangelog(prNumber, log, token) {
 	if (!log.startsWith("### 📝 更新日志")) return false;
-	const changelog = extractChangelog(log || "", getInputPkgs());
-	info(`stash_changelog: ${JSON.stringify(changelog, null, 2)}`);
 	const { createPullRequest, getOpenPullRequestByHead, getPullRequestData } = useGithub(token);
 	const prData = await getPullRequestData(prNumber);
 	const { cloneRepo, addRemote, checkoutPr, checkoutBranch, createBranch, gitPush, isNeedCommit } = useGit(token);
@@ -31695,6 +31716,9 @@ async function confirmChangelog(prNumber, log, token) {
 	} else await checkoutBranch(prData.head.ref);
 	const pkgs = getConfiguredPackages(cwd());
 	info(`pkgs: ${JSON.stringify(pkgs, null, 2)}`);
+	const pkgNames = pkgs.map((p) => p.name);
+	const changelog = extractChangelog(log || "", pkgNames.length ? pkgNames : getInputPkgs());
+	info(`stash_changelog: ${JSON.stringify(changelog, null, 2)}`);
 	stashPackageChangelog(prData, pkgs, changelog);
 	await exec("git", ["add", "**/pr-*.md"]);
 	await exec("git", ["status"]);

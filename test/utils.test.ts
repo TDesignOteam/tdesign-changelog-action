@@ -114,6 +114,24 @@ describe('utils', () => {
       expect(log).toMatchSnapshot()
     })
 
+    it('all 日志只分发给 body 中显式出现的包，缺少 heading 的包不获得 all 条目', () => {
+      const packages = getPackages('fixtures/repo2')
+      // pr_body9 有 all + pkg-a + pkg-c，但没有 pkg-b heading
+      const body = readFileSync('fixtures/pull_request_body/pr_body9.md', 'utf8')
+      const log = extractChangelog(body, packages.map(pkg => pkg.name))
+      // pkg-b 没有 heading，all 条目不应发给它
+      expect(log['pkg-a']).toEqual([
+        'feat(Button): New Component',
+        'chore(utils): add `isString` function',
+      ])
+      expect(log['pkg-b']).toEqual([])
+      expect(log['pkg-c']).toEqual([
+        'feat(Button): New Component',
+        'chore(utils): add `isString` function',
+      ])
+      expect(log).toMatchSnapshot()
+    })
+
     // it('本条 PR 不需要纳入 Changelog', () => {
     //   const packages = getPackages('fixtures/repo1')
 
