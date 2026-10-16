@@ -2,7 +2,7 @@ import type { PullRequestData } from '../types'
 import { cwd } from 'node:process'
 import { getInput, info, setOutput, warning } from '@actions/core'
 import * as github from '@actions/github'
-import { buildReleaseComments, extractChangelog, getConfiguredPackages, getInputPkgs, getPullRequestNumber, getPullRequestReleaseDirs, getStashChangelog, getTagChangelog, isSingleMode, publishRelease, renderChangelogMarkdown, sortReleasePackages } from '../utils'
+import { buildReleaseComments, extractChangelog, getConfiguredPackages, getInputPkgs, getPullRequestNumber, getPullRequestReleaseDirs, getSingleManifestPath, getStashChangelog, getTagChangelog, isSingleMode, publishRelease, renderChangelogMarkdown, sortReleasePackages } from '../utils'
 import useGit from '../utils/git'
 import useGithub from '../utils/github'
 import { translateText } from '../utils/translate'
@@ -52,7 +52,7 @@ export async function pull_request(token: string) {
       info(`changeFiles: ${JSON.stringify(changeFiles, null, 2)}`)
       let releaseDirs
       if (useTagChangelog) {
-        const manifestPath = (getInput('package-json-path', { trimWhitespace: true }) || 'package.json').replace(/^\.\//, '')
+        const manifestPath = getSingleManifestPath()
         const manifestContent = await getRepositoryFile(manifestPath, pullRequestData.head.sha)
         releaseDirs = getPullRequestReleaseDirs(changeFiles, undefined, { [manifestPath]: manifestContent })
       }

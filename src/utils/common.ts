@@ -700,10 +700,13 @@ export function getInputPkgs() {
     .filter(Boolean)
 }
 
+export function getSingleManifestPath(): string {
+  return core.getInput('manifest-path', { trimWhitespace: true }).replace(/^\.\//, '') || 'package.json'
+}
+
 export function getConfiguredPackages(path: string) {
   if (isSingleMode()) {
-    const manifestPath = core.getInput('package-json-path', { trimWhitespace: true }) || resolve(path, 'package.json')
-    return [getSinglePackage(path, manifestPath)]
+    return [getSinglePackage(path, resolve(path, getSingleManifestPath()))]
   }
   const packageNames = getInputPkgs()
   const packages = getPackages(path)

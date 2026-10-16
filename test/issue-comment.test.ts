@@ -139,8 +139,8 @@ describe('issue_comment', () => {
     const { getConfiguredPackages } = await import('../src/utils/common')
     // pkg-b 被删除，磁盘只剩下 pkg-a 和 pkg-c
     vi.mocked(getConfiguredPackages).mockReturnValue([
-      { name: 'pkg-a', relativeDir: 'packages/pkg-a', type: 'node' as const },
-      { name: 'pkg-c', relativeDir: 'packages/pkg-c', type: 'node' as const },
+      { name: 'pkg-a', relativeDir: 'packages/pkg-a', type: 'node' as const, private: false, dependencies: [], dir: 'packages/pkg-a' },
+      { name: 'pkg-c', relativeDir: 'packages/pkg-c', type: 'node' as const, private: false, dependencies: [], dir: 'packages/pkg-c' },
     ])
 
     mocks.context.payload.comment.body = '  /changelog\n'
@@ -159,8 +159,8 @@ describe('issue_comment', () => {
     expect(mocks.stashPackageChangelog).toHaveBeenCalledWith(
       prData,
       [
-        { name: 'pkg-a', relativeDir: 'packages/pkg-a', type: 'node' },
-        { name: 'pkg-c', relativeDir: 'packages/pkg-c', type: 'node' },
+        { name: 'pkg-a', relativeDir: 'packages/pkg-a', type: 'node', private: false, dependencies: [], dir: 'packages/pkg-a' },
+        { name: 'pkg-c', relativeDir: 'packages/pkg-c', type: 'node', private: false, dependencies: [], dir: 'packages/pkg-c' },
       ],
       expect.any(Object),
     )

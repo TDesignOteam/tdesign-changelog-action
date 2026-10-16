@@ -31532,8 +31532,11 @@ async function getPrCommentWhitelist() {
 function getInputPkgs() {
 	return getMultilineInput("packages", { trimWhitespace: true }).flatMap((line) => line.split(",")).map((pkg) => pkg.trim()).filter(Boolean);
 }
+function getSingleManifestPath() {
+	return getInput("manifest-path", { trimWhitespace: true }).replace(/^\.\//, "") || "package.json";
+}
 function getConfiguredPackages(path) {
-	if (isSingleMode()) return [getSinglePackage(path, getInput("package-json-path", { trimWhitespace: true }) || resolve$1(path, "package.json"))];
+	if (isSingleMode()) return [getSinglePackage(path, resolve$1(path, getSingleManifestPath()))];
 	const packageNames = getInputPkgs();
 	const packages = getPackages(path);
 	return packageNames.length ? packages.filter((pkg) => packageNames.includes(pkg.name)) : packages;
@@ -83152,7 +83155,7 @@ async function pull_request(token) {
 			info(`changeFiles: ${JSON.stringify(changeFiles, null, 2)}`);
 			let releaseDirs;
 			if (useTagChangelog) {
-				const manifestPath = (getInput("package-json-path", { trimWhitespace: true }) || "package.json").replace(/^\.\//, "");
+				const manifestPath = getSingleManifestPath();
 				const manifestContent = await getRepositoryFile(manifestPath, pullRequestData.head.sha);
 				releaseDirs = getPullRequestReleaseDirs(changeFiles, void 0, { [manifestPath]: manifestContent });
 			} else releaseDirs = getPullRequestReleaseDirs(changeFiles, getConfiguredPackages(cwd()));

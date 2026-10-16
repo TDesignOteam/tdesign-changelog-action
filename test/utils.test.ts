@@ -13,6 +13,7 @@ import {
   getInputPkgs,
   getPackages,
   getPullRequestReleaseDirs,
+  getSingleManifestPath,
   getStashChangelog,
   isExtractPRLog,
   parseMarkdown,
@@ -235,7 +236,7 @@ describe('utils', () => {
 
   it('uses the configured manifest in single mode', () => {
     process.env.INPUT_MODE = 'single'
-    process.env['INPUT_PACKAGE-JSON-PATH'] = 'packages/pkg-a/package.json'
+    process.env['INPUT_MANIFEST-PATH'] = 'packages/pkg-a/package.json'
 
     try {
       expect(getConfiguredPackages('fixtures/repo1')).toMatchObject([
@@ -244,7 +245,20 @@ describe('utils', () => {
     }
     finally {
       delete process.env.INPUT_MODE
-      delete process.env['INPUT_PACKAGE-JSON-PATH']
+      delete process.env['INPUT_MANIFEST-PATH']
+    }
+  })
+
+  it('getSingleManifestPath defaults to package.json and strips the ./ prefix', () => {
+    expect(getSingleManifestPath()).toBe('package.json')
+
+    process.env['INPUT_MANIFEST-PATH'] = './packages/pkg-a/pubspec.yaml'
+
+    try {
+      expect(getSingleManifestPath()).toBe('packages/pkg-a/pubspec.yaml')
+    }
+    finally {
+      delete process.env['INPUT_MANIFEST-PATH']
     }
   })
 

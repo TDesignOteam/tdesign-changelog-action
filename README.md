@@ -161,8 +161,8 @@ jobs:
 | `pr_number` | `workflow_run` 必需 | `workflow_run` 无法从事件直接获得 PR 编号时使用，其他事件不需要。 |
 | `translate-secret-id` | 否 | 腾讯混元翻译 SecretId；与 `translate-secret-key` 同时配置后生成英文 release 日志评论。 |
 | `translate-secret-key` | 否 | 腾讯混元翻译 SecretKey。 |
-| `mode` | 否 | 仓库模式：`single`(单仓) 或 `monorepo`(monorepo)。默认 `monorepo`。`single` 模式下不依赖 `.changelog/*.md` 暂存文件,直接从 tag 区间已合并 PR 的 body 生成发布日志,且使用纯版本号 git tag(如 `1.2.3`)。 |
-| `package-json-path` | 否 | `single` 模式下指定 `package.json` 的相对路径,默认读取仓库根目录的 `package.json`。仅 `single` 模式生效。 |
+| `mode` | 否 | 仓库模式：`single`(单仓) 或 `monorepo`(monorepo)。默认 `single`。`single` 模式下不依赖 `.changelog/*.md` 暂存文件,直接从 tag 区间已合并 PR 的 body 生成发布日志,且使用纯版本号 git tag(如 `1.2.3`)。 |
+| `manifest-path` | 否 | `single` 模式下指定 manifest(`package.json` 或 `pubspec.yaml`)的相对路径,默认读取仓库根目录的 `package.json`。仅 `single` 模式生效。 |
 | `changelog-path` | 否 | `single` 模式下指定 `CHANGELOG.md` 的相对路径,默认在包目录下读写 `CHANGELOG.md` / `CHANGELOG.en-US.md`。仅 `single` 模式生效。 |
 | `from-tag` | 否 | 覆盖日志区间起始 tag。单仓预发布默认取目标 ref 可达的最近 tag，稳定版默认取最近稳定 tag；目标历史无 tag 时扫描全部历史。 |
 | `to-tag` | 否 | 覆盖日志区间结束 ref。默认取 release PR 的 base 分支。 |
@@ -300,7 +300,7 @@ PR body 没有有效的 `type(scope): message` 日志且未显式跳过时，tde
 
 单仓模式下,release PR 合并后的 GitHub tag 使用纯版本号(如 `1.2.3`)而非 `${name}@${version}`。预发布版本会创建 GitHub prerelease，并生成相对最近 tag 的增量日志；稳定版会汇总最近稳定 tag 之后的完整日志。
 
-可通过 `package-json-path` 指定非根目录的 `package.json`,通过 `changelog-path` 指定自定义的 `CHANGELOG.md` 读写位置。
+可通过 `manifest-path` 指定非根目录的 `package.json` 或 `pubspec.yaml`,通过 `changelog-path` 指定自定义的 `CHANGELOG.md` 读写位置。
 
 所有触发 tdesign-changelog-action 的 workflow（release PR 打开、确认评论、release PR 关闭）必须传入相同的单仓配置，例如：
 
@@ -309,7 +309,7 @@ PR body 没有有效的 `type(scope): message` 日志且未显式跳过时，tde
   with:
     token: ${{ secrets.TDESIGN_BOT_TOKEN }}
     mode: single
-    package-json-path: package.json
+    manifest-path: package.json
     changelog-path: CHANGELOG.md
 ```
 

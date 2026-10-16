@@ -38,6 +38,7 @@ vi.mock('../src/utils', () => ({
   getInputPkgs: () => [],
   getPullRequestNumber: () => 42,
   getPullRequestReleaseDirs: mocks.getPullRequestReleaseDirs,
+  getSingleManifestPath: () => mocks.inputs['manifest-path'] || 'package.json',
   getStashChangelog: vi.fn(),
   getTagChangelog: mocks.getTagChangelog,
   isSingleMode: () => mocks.inputs.mode === 'single',
@@ -112,6 +113,14 @@ describe('pull_request single mode', () => {
     expect(mocks.getRepositoryFile).toHaveBeenCalledWith('package.json', 'head-sha')
     expect(mocks.getLatestTag).toHaveBeenCalledWith('main', true)
     expect(mocks.getTagChangelog).toHaveBeenCalledWith('token', ['pkg-a'], '1.0.0', 'main')
+  })
+
+  it('reads the manifest configured via manifest-path', async () => {
+    mocks.inputs['manifest-path'] = 'packages/pkg-a/pubspec.yaml'
+
+    await pull_request('token')
+
+    expect(mocks.getRepositoryFile).toHaveBeenCalledWith('packages/pkg-a/pubspec.yaml', 'head-sha')
   })
 
   it('uses the latest tag and creates a comment for a prerelease', async () => {
