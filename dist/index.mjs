@@ -31096,12 +31096,14 @@ function getChangelogFilePath(release, lang) {
 	return `${release.dir}/${fileName}`;
 }
 const USE_PASCAL_CASE_REG = /^Use(?=[A-Z])/;
+const T_PREFIXED_PASCAL_CASE_REG = /^[tT](?=[A-Z])/;
 const RN_TO_LF_REG = /\r\n/g;
 const COMMON_PR_REG = /\[common#\d+\]/;
 const CONTRIBUTOR_WITH_SPACE_REG = /@.*\s$/;
 const GITHUB_COMMENT_MAX_LENGTH = 65536;
 function pascalCase(str) {
 	if (str.toLowerCase() === "qrcode") return "QRCode";
+	if (T_PREFIXED_PASCAL_CASE_REG.test(str)) return `T${str.slice(1)}`;
 	const pascalCaseStr = camelCase(str, { pascalCase: true });
 	if (pascalCaseStr.startsWith("Use")) return pascalCaseStr.replace(USE_PASCAL_CASE_REG, "use");
 	return pascalCaseStr;

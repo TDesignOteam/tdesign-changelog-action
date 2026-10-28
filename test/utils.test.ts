@@ -17,6 +17,7 @@ import {
   getStashChangelog,
   isExtractPRLog,
   parseMarkdown,
+  pascalCase,
   renderChangelogMarkdown,
   stashPackageChangelog,
 } from '../src/utils/common'
@@ -40,6 +41,27 @@ describe('utils', () => {
     expect(data.type).toBe('heading')
     expect(data.depth).toBe(3)
     expect(data.text).toBe('📝 更新日志')
+  })
+
+  describe('pascalCase', () => {
+    it('t 开头的组件名仅固定开头 T 为大写，其余保持原样', () => {
+      expect(pascalCase('TActionSheet')).toBe('TActionSheet')
+      expect(pascalCase('tActionSheet')).toBe('TActionSheet')
+      expect(pascalCase('TQRCode')).toBe('TQRCode')
+    })
+
+    it('带分隔符的 scope 仍按 PascalCase 转换', () => {
+      expect(pascalCase('t-action-sheet')).toBe('TActionSheet')
+      expect(pascalCase('T-ACTION-SHEET')).toBe('TActionSheet')
+      expect(pascalCase('action-sheet')).toBe('ActionSheet')
+      expect(pascalCase('button')).toBe('Button')
+    })
+
+    it('保留既有特例', () => {
+      expect(pascalCase('qrcode')).toBe('QRCode')
+      expect(pascalCase('use-count-down')).toBe('useCountDown')
+      expect(pascalCase('useCountDown')).toBe('useCountDown')
+    })
   })
 
   it('getPackages', () => {

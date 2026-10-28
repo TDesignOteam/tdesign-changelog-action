@@ -40,6 +40,7 @@ export function getChangelogFilePath(release: ReleasePackage, lang: 'zh' | 'en')
 }
 
 const USE_PASCAL_CASE_REG = /^Use(?=[A-Z])/
+const T_PREFIXED_PASCAL_CASE_REG = /^[tT](?=[A-Z])/
 const RN_TO_LF_REG = /\r\n/g
 const COMMON_PR_REG = /\[common#\d+\]/
 const CONTRIBUTOR_WITH_SPACE_REG = /@.*\s$/
@@ -49,6 +50,10 @@ type ReleaseHeading = '🎉 Release' | '🎉 发布'
 export function pascalCase(str: string) {
   if (str.toLowerCase() === 'qrcode') {
     return 'QRCode'
+  }
+  // T 开头且第二个字母为大写（如 TActionSheet / tActionSheet）时，仅固定开头 T 为大写，其余保持原样
+  if (T_PREFIXED_PASCAL_CASE_REG.test(str)) {
+    return `T${str.slice(1)}`
   }
   const pascalCaseStr = camelcase(str, { pascalCase: true })
   if (pascalCaseStr.startsWith('Use')) {
