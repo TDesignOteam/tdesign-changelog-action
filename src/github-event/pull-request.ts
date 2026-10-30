@@ -96,12 +96,12 @@ export async function pull_request(token: string) {
           const zhBody = `# 🎉 发布 ${release.name}\n## 🌈 ${release.version} \`${year}-${month}-${day}\` \n\n${md}`
           zhComments.push(zhBody)
 
-          const secretId = getInput('translate-secret-id', { trimWhitespace: true })
-          const secretKey = getInput('translate-secret-key', { trimWhitespace: true })
-          if (secretId && secretKey && md) {
-          // tmt 翻译
+          const apiKey = getInput('translate-api-key', { trimWhitespace: true })
+          const baseURL = getInput('translate-base-url', { trimWhitespace: true })
+          const model = getInput('translate-model', { trimWhitespace: true })
+          if (apiKey && md) {
             try {
-              const text = await translateText(secretId, secretKey, md)
+              const text = await translateText(apiKey, md, { baseURL, model })
               info(`en_md: ${text}`)
               const enBody = `# 🎉 Release ${release.name}\n## 🌈 ${release.version} \`${year}-${month}-${day}\` \n\n${text}`
               enComments.push(enBody)

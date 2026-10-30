@@ -159,8 +159,9 @@ jobs:
 | `token` | 按流程 | GitHub API、Git clone/push 和创建 Release 使用的 token。仅生成普通 PR 的 `changelog` output 时可为空，完整流程需要有效 token。 |
 | `packages` | monorepo Changelog 流程必需 | 参与日志提取的包名。支持逗号或多行输入，名称必须与 manifest 中的 `name` 完全一致。release 检测未配置时会使用发现的全部包；`single` 模式无需配置。 |
 | `pr_number` | `workflow_run` 必需 | `workflow_run` 无法从事件直接获得 PR 编号时使用，其他事件不需要。 |
-| `translate-secret-id` | 否 | 腾讯混元翻译 SecretId；与 `translate-secret-key` 同时配置后生成英文 release 日志评论。 |
-| `translate-secret-key` | 否 | 腾讯混元翻译 SecretKey。 |
+| `translate-api-key` | 否 | OpenAI-compatible 翻译服务 API Key；配置后生成英文 release 日志评论。 |
+| `translate-base-url` | 否 | 翻译服务 API 地址，默认 `https://tokenhub.tencentmaas.com/v1`。 |
+| `translate-model` | 否 | 翻译模型，默认 `hy-mt2-plus`。 |
 | `mode` | 否 | 仓库模式：`single`(单仓) 或 `monorepo`(monorepo)。默认 `single`。`single` 模式下不依赖 `.changelog/*.md` 暂存文件,直接从 tag 区间已合并 PR 的 body 生成发布日志,且使用纯版本号 git tag(如 `1.2.3`)。 |
 | `manifest-path` | 否 | `single` 模式下指定 manifest(`package.json` 或 `pubspec.yaml`)的相对路径,默认读取仓库根目录的 `package.json`。仅 `single` 模式生效。 |
 | `changelog-path` | 否 | `single` 模式下指定 `CHANGELOG.md` 的相对路径,默认在包目录下读写 `CHANGELOG.md` / `CHANGELOG.en-US.md`。仅 `single` 模式生效。 |
