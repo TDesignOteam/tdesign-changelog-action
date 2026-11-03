@@ -61,6 +61,20 @@ describe('getTagChangelog', () => {
     expect(md).toContain('- `Bb`: bb @alice ([#2](https://github.com/owner/repo/pull/2))')
   })
 
+  it('does not append PR information when the changelog already references an icons PR', async () => {
+    mocks.getMergedPrNumbersBetweenRefs.mockResolvedValue([213])
+    mocks.getPullRequestData.mockResolvedValue(prData({
+      number: 213,
+      html_url: 'https://github.com/owner/repo/pull/213',
+      body: '### 📝 更新日志\n\n- feat(Icon): 新增 `check-1`和`remove-1` 图标 @uyarn ([icons#319](https://github.com/Tencent/tdesign-icons/pull/319))',
+    }))
+
+    const md = await getTagChangelog('token', ['pkg-a'], '1.0.0', 'main')
+
+    expect(md).toContain('- `Icon`: 新增 `check-1`和`remove-1` 图标 @uyarn ([icons#319](https://github.com/Tencent/tdesign-icons/pull/319))')
+    expect(md).not.toContain('([#213]')
+  })
+
   it('skips Bot and skip-changelog PRs', async () => {
     mocks.getMergedPrNumbersBetweenRefs.mockResolvedValue([1, 2, 3])
     mocks.getPullRequestData.mockImplementation(async (n: number) => {

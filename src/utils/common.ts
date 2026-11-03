@@ -42,7 +42,7 @@ export function getChangelogFilePath(release: ReleasePackage, lang: 'zh' | 'en')
 const USE_PASCAL_CASE_REG = /^Use(?=[A-Z])/
 const T_PREFIXED_PASCAL_CASE_REG = /^[tT](?=[A-Z])/
 const RN_TO_LF_REG = /\r\n/g
-const COMMON_PR_REG = /\[common#\d+\]/
+const COMMON_PR_REG = /\[(?:common|icons)#\d+\]/
 const CONTRIBUTOR_WITH_SPACE_REG = /@.*\s$/
 const GITHUB_COMMENT_MAX_LENGTH = 65536
 type ReleaseHeading = '🎉 Release' | '🎉 发布'
