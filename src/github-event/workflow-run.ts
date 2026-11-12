@@ -24,8 +24,8 @@ export async function workflow_run(token: string) {
     return false
   }
   const prNumber = Number(core.getInput('pr_number', { required: true }))
-  if (!Number.isInteger(prNumber) || prNumber <= 0 || !workflowRun.pull_requests.some((pr: { number: number }) => pr.number === prNumber)) {
-    core.warning(`pr_number is not associated with this workflow run: ${prNumber}`)
+  if (!Number.isInteger(prNumber) || prNumber <= 0) {
+    core.warning(`invalid pr_number: ${prNumber}`)
     return false
   }
   const actor = workflowRun.actor?.login || github.context.actor
@@ -42,6 +42,13 @@ export async function workflow_run(token: string) {
 
   const { getPullRequestData } = useGithub(token)
   const pullRequestData = await getPullRequestData(prNumber) as PullRequestData
+  // workflow_run.pull_requests 对 fork PR 恒为空数组,pull_request_review 触发时也经常不填充,
+  // 无法仅凭该数组判断 pr_number 是否属于本次运行;此时补充 head_sha 关联校验
+  const isListedPr = (workflowRun.pull_requests || []).some((pr: { number: number }) => pr.number === prNumber)
+  if (!isListedPr && pullRequestData.head?.sha !== workflowRun.head_sha) {
+    core.warning(`pr_number is not associated with this workflow run: ${prNumber} (pr head: ${pullRequestData.head?.sha || 'unknown'}, run head_sha: ${workflowRun.head_sha || 'unknown'})`)
+    return false
+  }
   const isRelease = pullRequestData.head.ref.startsWith('release/')
   if (isRelease) {
     return false

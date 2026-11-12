@@ -42614,8 +42614,8 @@ async function workflow_run(token) {
 		return false;
 	}
 	const prNumber = Number(getInput("pr_number", { required: true }));
-	if (!Number.isInteger(prNumber) || prNumber <= 0 || !workflowRun.pull_requests.some((pr) => pr.number === prNumber)) {
-		warning(`pr_number is not associated with this workflow run: ${prNumber}`);
+	if (!Number.isInteger(prNumber) || prNumber <= 0) {
+		warning(`invalid pr_number: ${prNumber}`);
 		return false;
 	}
 	const actor = workflowRun.actor?.login || context.actor;
@@ -42630,6 +42630,10 @@ async function workflow_run(token) {
 	}
 	const { getPullRequestData } = useGithub(token);
 	const pullRequestData = await getPullRequestData(prNumber);
+	if (!(workflowRun.pull_requests || []).some((pr) => pr.number === prNumber) && pullRequestData.head?.sha !== workflowRun.head_sha) {
+		warning(`pr_number is not associated with this workflow run: ${prNumber} (pr head: ${pullRequestData.head?.sha || "unknown"}, run head_sha: ${workflowRun.head_sha || "unknown"})`);
+		return false;
+	}
 	if (pullRequestData.head.ref.startsWith("release/")) return false;
 	let logs = "";
 	const prLog = extractChangelog(pullRequestData.body || "", getInputPkgs());

@@ -37,6 +37,7 @@ function workflowRunPayload() {
     status: 'completed',
     actor: { login: 'maintainer' },
     triggering_actor: { login: 'maintainer' },
+    head_sha: 'sha-run',
     pull_requests: [{ number: 42 }],
   }
 }
@@ -47,7 +48,7 @@ describe('workflow_run', () => {
     mocks.context.eventName = 'workflow_run'
     mocks.context.payload = { workflow_run: workflowRunPayload() }
     mocks.getPrCommentWhitelist.mockResolvedValue(['maintainer'])
-    mocks.getPullRequestData.mockResolvedValue({ body: 'body', head: { ref: 'feat/a' } })
+    mocks.getPullRequestData.mockResolvedValue({ body: 'body', head: { ref: 'feat/a', sha: 'sha-run' } })
     mocks.extractChangelog.mockReturnValue({ 'pkg-a': ['feat: add feature'] })
   })
 
@@ -62,11 +63,26 @@ describe('workflow_run', () => {
     )
   })
 
+  it('confirms a changelog when pull_requests is empty but head sha matches the run', async () => {
+    mocks.context.payload.workflow_run.pull_requests = []
+
+    await workflow_run('token')
+
+    expect(mocks.getPullRequestData).toHaveBeenCalledWith(42)
+    expect(mocks.confirmChangelog).toHaveBeenCalledWith(
+      42,
+      '### 📝 更新日志\n\n#### pkg-a\n- feat: add feature\n\n\n',
+      'token',
+    )
+  })
+
   it('rejects a pull request not associated with the workflow run', async () => {
     mocks.context.payload.workflow_run.pull_requests = [{ number: 7 }]
+    mocks.getPullRequestData.mockResolvedValue({ body: 'body', head: { ref: 'feat/a', sha: 'sha-other' } })
 
     await expect(workflow_run('token')).resolves.toBe(false)
-    expect(mocks.getPullRequestData).not.toHaveBeenCalled()
+    expect(mocks.getPullRequestData).toHaveBeenCalledWith(42)
+    expect(mocks.confirmChangelog).not.toHaveBeenCalled()
   })
 
   it('rejects a rerun triggered by another actor', async () => {
