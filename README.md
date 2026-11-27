@@ -9,6 +9,7 @@ tdesign-changelog-action 支持包含 `package.json` 的 Node 包和包含 `pubs
 - 从普通 PR 描述中提取结构化更新日志。
 - 通过 `/changelog` 指令、Review 通过或编辑确认评论提交日志。
 - 按包生成 `.changelog/pr-<PR number>.md` 暂存文件，并补充贡献者和 PR 链接。
+- 支持通过 `sync-packages` 把 monorepo 中源包（如 core）的日志同步写入包装它的包（如 vue、react）。
 - 在 release PR 中按类型和 scope 汇总日志，生成中英文 Changelog 确认评论。
 - release PR 合并后发布 Node 包，并按仓库模式创建 `${name}@${version}` 或纯版本号 tag。
 - 识别同一仓库中的 Node 和 Flutter 包。
@@ -167,6 +168,7 @@ jobs:
 | `changelog-path` | 否 | `single` 模式下指定 `CHANGELOG.md` 的相对路径,默认在包目录下读写 `CHANGELOG.md` / `CHANGELOG.en-US.md`。仅 `single` 模式生效。 |
 | `from-tag` | 否 | 覆盖日志区间起始 tag。单仓预发布默认取目标 ref 可达的最近 tag，稳定版默认取最近稳定 tag；目标历史无 tag 时扫描全部历史。 |
 | `to-tag` | 否 | 覆盖日志区间结束 ref。默认取 release PR 的 base 分支。 |
+| `sync-packages` | 否 | monorepo 模式下配置日志同步关系，格式为 `源包:目标包1,目标包2`，每行一条，同一源包可写多行。源包确认的日志会写入各目标包的 `.changelog` 暂存文件；包名必须与 manifest 中的 `name` 完全一致，出现未知包名时确认流程会报错。仅 `monorepo` 模式生效。 |
 
 | Output | 说明 |
 | --- | --- |
@@ -204,6 +206,45 @@ type(scope): message
 - fix(use-popup): 修复弹层关闭异常
 - breaking: 移除废弃属性
 ```
+
+### 日志同步
+
+monorepo 中存在基于同一 core 封装的框架包（如 vue、react）时，可以通过 `sync-packages` 让源包的日志同步写入目标包：
+
+```yaml
+- uses: TDesignOteam/tdesign-changelog-action@develop
+  with:
+    token: ${{ secrets.TDESIGN_BOT_TOKEN }}
+    packages: 'core,vue,react'
+    sync-packages: 'core:vue,react'
+```
+
+PR 描述中：
+
+```md
+### 📝 更新日志
+
+#### core
+
+- feat(Button): 新增加载状态
+
+#### vue
+
+- fix(Table): 修复表格滚动异常
+```
+
+确认后写入：
+
+- `packages/core/.changelog/pr-<PR number>.md`：新增加载状态。
+- `packages/vue/.changelog/pr-<PR number>.md`：修复表格滚动异常、新增加载状态（目标包自己的条目在前）。
+- `packages/react/.changelog/pr-<PR number>.md`：新增加载状态（body 中没有 `#### react` 也会生成）。
+
+同步规则：
+
+- 目标包已有的完全相同条目不会重复追加，因此 `all` 与同步叠加不会产生重复日志。
+- 只做单层同步，不传递：配置 `a:b` 与 `b:c` 时，`a` 的日志不会进入 `c`。
+- 普通 PR 打开时的待确认评论保持描述原样，只在首行提示同步关系；修改 `#### core` 下的条目后，同步内容以修改后的为准。
+- 源包或目标包必须是 `packages` 参数或仓库发现的包，否则确认流程会报错。
 
 ### 跳过日志
 

@@ -31518,6 +31518,67 @@ async function getPrCommentWhitelist() {
 function getInputPkgs() {
 	return getMultilineInput("packages", { trimWhitespace: true }).flatMap((line) => line.split(",")).map((pkg) => pkg.trim()).filter(Boolean);
 }
+/**
+* 解析 `sync-packages` 输入(`源包:目标包1,目标包2`,每行一条)。
+* 同一源包出现在多行时合并目标;不校验包名是否是已配置的包。
+*/
+function parseSyncPackages() {
+	const lines = getMultilineInput("sync-packages", { trimWhitespace: true });
+	const syncMap = /* @__PURE__ */ new Map();
+	lines.forEach((line) => {
+		const separatorIndex = line.indexOf(":");
+		if (separatorIndex <= 0) throw new Error(`sync-packages line must be in the "source:target1,target2" format: ${line}`);
+		const source = line.slice(0, separatorIndex).trim();
+		const targets = line.slice(separatorIndex + 1).split(",").map((target) => target.trim()).filter(Boolean);
+		if (!source || !targets.length) throw new Error(`sync-packages line must specify a source package and at least one target package: ${line}`);
+		const merged = syncMap.get(source) || /* @__PURE__ */ new Set();
+		targets.forEach((target) => merged.add(target));
+		syncMap.set(source, merged);
+	});
+	return [...syncMap.entries()].map(([source, targets]) => ({
+		source,
+		targets: [...targets]
+	}));
+}
+/**
+* 返回校验过的日志同步关系;源包或目标包不是已配置的包时抛错。
+*/
+function getSyncPackages(packageNames) {
+	const syncs = parseSyncPackages();
+	const knownNames = new Set(packageNames);
+	syncs.forEach(({ source, targets }) => {
+		const unknownPackages = [source, ...targets].filter((name) => !knownNames.has(name));
+		if (unknownPackages.length) throw new Error(`sync-packages references unknown packages: ${unknownPackages.join(", ")}`);
+		if (targets.includes(source)) throw new Error(`sync-packages source package cannot be its own target: ${source}`);
+	});
+	return syncs;
+}
+/**
+* 将源包日志追加到各目标包(目标包已有的相同条目不重复追加)。
+* 源包条目取自同步前的结果,因此不做 a→b、b→c 的传递同步。
+*/
+function syncChangelog(changelog, syncs) {
+	if (!syncs.length) return changelog;
+	const originalLogs = new Map(Object.entries(changelog));
+	const syncedChangelog = { ...changelog };
+	syncs.forEach(({ source, targets }) => {
+		const sourceLogs = originalLogs.get(source);
+		if (!sourceLogs?.length) return;
+		targets.forEach((target) => {
+			const targetLogs = originalLogs.get(target);
+			if (!targetLogs) return;
+			syncedChangelog[target] = [...targetLogs, ...sourceLogs.filter((log) => !targetLogs.includes(log))];
+		});
+	});
+	return syncedChangelog;
+}
+/**
+* 普通 PR 预览评论的同步提示:仅在 body 中源包下确有日志时返回提示文案。
+*/
+function getSyncHint(prLog) {
+	const hints = parseSyncPackages().filter(({ source }) => prLog[source]?.length).map(({ source, targets }) => `\`${source}\` 的日志会同步到 ${targets.map((target) => `\`${target}\``).join("、")}`);
+	return hints.length ? `（${hints.join("；")}）` : "";
+}
 function getSingleManifestPath() {
 	return getInput("manifest-path", { trimWhitespace: true }).replace(/^\.\//, "") || "package.json";
 }
@@ -31706,9 +31767,13 @@ async function confirmChangelog(prNumber, log, token) {
 	const pkgs = getConfiguredPackages(cwd());
 	info(`pkgs: ${JSON.stringify(pkgs, null, 2)}`);
 	const pkgNames = pkgs.map((p) => p.name);
-	const changelog = extractChangelog(log || "", pkgNames.length ? pkgNames : getInputPkgs());
-	info(`stash_changelog: ${JSON.stringify(changelog, null, 2)}`);
-	stashPackageChangelog(prData, pkgs, changelog);
+	const changelogNames = pkgNames.length ? pkgNames : getInputPkgs();
+	const changelog = extractChangelog(log || "", changelogNames);
+	const syncs = isSingleMode() ? [] : getSyncPackages(changelogNames);
+	const syncedChangelog = syncChangelog(changelog, syncs);
+	info(`stash_changelog: ${JSON.stringify(syncedChangelog, null, 2)}`);
+	if (syncs.length) info(`sync_packages: ${JSON.stringify(syncs, null, 2)}`);
+	stashPackageChangelog(prData, pkgs, syncedChangelog);
 	await exec("git", ["add", "**/pr-*.md"]);
 	await exec("git", ["status"]);
 	if (!await isNeedCommit()) {
@@ -42487,8 +42552,7 @@ async function pull_request(token) {
 					logs += `- ${log}\n`;
 				});
 			});
-			if (logs) setOutput("changelog", `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的日志暂存区
-### 📝 更新日志\n\n${logs}\n\n <!-- FLOW-PR-CHANGELOG -->`);
+			if (logs) setOutput("changelog", `${`(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的日志暂存区${getSyncHint(prLog)}\n`}### 📝 更新日志\n\n${logs}\n\n <!-- FLOW-PR-CHANGELOG -->`);
 		}
 		const isForkPr = pullRequestData.base.repo.full_name !== pullRequestData.head.repo.full_name;
 		if (isRelease && !isForkPr && context.payload.action === "opened") {

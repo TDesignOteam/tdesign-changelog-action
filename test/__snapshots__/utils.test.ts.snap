@@ -350,3 +350,37 @@ contributor: liweijie0812
 - fix(Button): fix Button @liweijie0812 ([#7](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
 "
 `;
+
+exports[`utils > syncChangelog > 同步后写入各包暂存文件 1`] = `
+"---
+pr_number: 8
+contributor: liweijie0812
+---
+
+- feat(Button): New Component @liweijie0812 ([#8](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- chore(utils): add \`isString\` function @liweijie0812 ([#8](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+"
+`;
+
+exports[`utils > syncChangelog > 同步后写入各包暂存文件 2`] = `
+"---
+pr_number: 8
+contributor: liweijie0812
+---
+
+- fix(link): fix link @liweijie0812 ([#8](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- feat(Button): New Component @liweijie0812 ([#8](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- chore(utils): add \`isString\` function @liweijie0812 ([#8](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+"
+`;
+
+exports[`utils > syncChangelog > 同步后写入各包暂存文件 3`] = `
+"---
+pr_number: 8
+contributor: liweijie0812
+---
+
+- feat(Button): New Component @liweijie0812 ([#8](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+- chore(utils): add \`isString\` function @liweijie0812 ([#8](https://github.com/TDesignOteam/tdesign-changelog-action/pull/6))
+"
+`;
