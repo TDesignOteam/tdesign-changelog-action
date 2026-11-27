@@ -44,9 +44,12 @@ const mocks = vi.hoisted(() => ({
   getOpenPullRequestByHead: vi.fn(),
   getPullRequestData: vi.fn(),
   getPullRequestFiles: vi.fn(),
+  getSyncPackages: vi.fn(),
   gitPush: vi.fn(),
   isNeedCommit: vi.fn(),
+  isSingleMode: vi.fn(),
   stashPackageChangelog: vi.fn(),
+  syncChangelog: vi.fn(),
 }))
 
 vi.mock('@actions/core', () => ({ info: vi.fn() }))
@@ -62,7 +65,10 @@ vi.mock('../src/utils/common', () => ({
   getPrCommentWhitelist: mocks.getPrCommentWhitelist,
   getPullRequestNumber: () => 42,
   getPullRequestReleaseDirs: vi.fn().mockReturnValue([]),
+  getSyncPackages: mocks.getSyncPackages,
+  isSingleMode: mocks.isSingleMode,
   stashPackageChangelog: mocks.stashPackageChangelog,
+  syncChangelog: mocks.syncChangelog,
 }))
 vi.mock('../src/utils/git', () => ({
   default: () => ({
@@ -110,9 +116,12 @@ describe('issue_comment', () => {
     mocks.getPrCommentWhitelist.mockResolvedValue(['maintainer'])
     mocks.getPullRequestData.mockResolvedValue(prData)
     mocks.extractChangelog.mockReturnValue({ 'pkg-a': ['feat(Button): add loading state'] })
+    mocks.getSyncPackages.mockReturnValue([])
+    mocks.isSingleMode.mockReturnValue(false)
     mocks.isNeedCommit.mockResolvedValue(false)
     mocks.getOpenPullRequestByHead.mockResolvedValue(undefined)
     mocks.createPullRequest.mockResolvedValue({ html_url: 'https://github.com/owner/repo/pull/43' })
+    mocks.syncChangelog.mockImplementation((changelog: Record<string, string[]>) => changelog)
   })
 
   it('submits the PR body changelog when /changelog is created', async () => {
@@ -163,6 +172,74 @@ describe('issue_comment', () => {
         { name: 'pkg-c', relativeDir: 'packages/pkg-c', type: 'node', private: false, dependencies: [], dir: 'packages/pkg-c' },
       ],
       expect.any(Object),
+    )
+  })
+
+  it('expands synced packages before stashing', async () => {
+    const { getConfiguredPackages } = await import('../src/utils/common')
+    vi.mocked(getConfiguredPackages).mockReturnValue([])
+    const syncs = [{ source: 'pkg-a', targets: ['pkg-b'] }]
+    mocks.getSyncPackages.mockReturnValue(syncs)
+    mocks.syncChangelog.mockImplementation((changelog: Record<string, string[]>) => ({
+      ...changelog,
+      'pkg-b': [...changelog['pkg-b'] || [], ...changelog['pkg-a']],
+    }))
+
+    mocks.context.payload.comment.body = '  /changelog\n'
+
+    await expect(issue_comment('token')).resolves.toBe(true)
+
+    expect(mocks.getSyncPackages).toHaveBeenCalledWith(['pkg-a'])
+    expect(mocks.syncChangelog).toHaveBeenCalledWith(
+      { 'pkg-a': ['feat(Button): add loading state'] },
+      syncs,
+    )
+    expect(mocks.stashPackageChangelog).toHaveBeenCalledWith(
+      prData,
+      [],
+      { 'pkg-a': ['feat(Button): add loading state'], 'pkg-b': ['feat(Button): add loading state'] },
+    )
+  })
+
+  it('expands synced packages when an edited comment confirms the changelog', async () => {
+    const { getConfiguredPackages } = await import('../src/utils/common')
+    vi.mocked(getConfiguredPackages).mockReturnValue([])
+    mocks.getSyncPackages.mockReturnValue([{ source: 'pkg-a', targets: ['pkg-b'] }])
+    mocks.syncChangelog.mockImplementation((changelog: Record<string, string[]>) => ({
+      ...changelog,
+      'pkg-b': [...changelog['pkg-b'] || [], ...changelog['pkg-a']],
+    }))
+    mocks.context.payload = {
+      action: 'edited',
+      changes: { body: { from: 'old body' } },
+      comment: { body: '### 📝 更新日志\n\n#### pkg-a\n- feat(Button): add loading state' },
+      issue: { number: 42, pull_request: {} },
+    }
+
+    await issue_comment('token')
+
+    expect(mocks.stashPackageChangelog).toHaveBeenCalledWith(
+      prData,
+      [],
+      expect.objectContaining({ 'pkg-b': ['feat(Button): add loading state'] }),
+    )
+  })
+
+  it('skips syncing in single mode', async () => {
+    const { getConfiguredPackages } = await import('../src/utils/common')
+    vi.mocked(getConfiguredPackages).mockReturnValue([])
+    mocks.isSingleMode.mockReturnValue(true)
+
+    mocks.context.payload.comment.body = '  /changelog\n'
+
+    await expect(issue_comment('token')).resolves.toBe(true)
+
+    expect(mocks.getSyncPackages).not.toHaveBeenCalled()
+    expect(mocks.syncChangelog).toHaveBeenCalledWith(expect.any(Object), [])
+    expect(mocks.stashPackageChangelog).toHaveBeenCalledWith(
+      prData,
+      [],
+      { 'pkg-a': ['feat(Button): add loading state'] },
     )
   })
 

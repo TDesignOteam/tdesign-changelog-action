@@ -35,6 +35,9 @@ inputs:
   to-tag:
     description: 覆盖日志区间结束 ref(默认取 release PR 的 base 分支)
     required: false
+  sync-packages:
+    description: monorepo 模式下配置日志同步关系,格式为 `源包:目标包1,目标包2`,每行一条。源包确认的日志会写入各目标包的暂存文件,包名必须与 manifest 中的 `name` 完全一致
+    required: false
 
 outputs:
   changelog:

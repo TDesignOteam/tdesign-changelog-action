@@ -1,5 +1,5 @@
 import type { Tokens, TokensList } from 'marked'
-import type { PackagesChangelog, PackageType, PullRequestData, PullRequestFiles, ReleasePackage } from '../types'
+import type { PackagesChangelog, PackageSync, PackageType, PullRequestData, PullRequestFiles, ReleasePackage } from '../types'
 import type { Package } from './get-packages'
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
 import { basename, dirname, resolve } from 'node:path'
@@ -703,6 +703,84 @@ export function getInputPkgs() {
     .flatMap(line => line.split(','))
     .map(pkg => pkg.trim())
     .filter(Boolean)
+}
+
+/**
+ * 解析 `sync-packages` 输入(`源包:目标包1,目标包2`,每行一条)。
+ * 同一源包出现在多行时合并目标;不校验包名是否是已配置的包。
+ */
+export function parseSyncPackages(): PackageSync[] {
+  const lines = core.getMultilineInput('sync-packages', { trimWhitespace: true })
+  const syncMap = new Map<string, Set<string>>()
+  lines.forEach((line) => {
+    const separatorIndex = line.indexOf(':')
+    if (separatorIndex <= 0) {
+      throw new Error(`sync-packages line must be in the "source:target1,target2" format: ${line}`)
+    }
+    const source = line.slice(0, separatorIndex).trim()
+    const targets = line.slice(separatorIndex + 1).split(',').map(target => target.trim()).filter(Boolean)
+    if (!source || !targets.length) {
+      throw new Error(`sync-packages line must specify a source package and at least one target package: ${line}`)
+    }
+    const merged = syncMap.get(source) || new Set<string>()
+    targets.forEach(target => merged.add(target))
+    syncMap.set(source, merged)
+  })
+  return [...syncMap.entries()].map(([source, targets]) => ({ source, targets: [...targets] }))
+}
+
+/**
+ * 返回校验过的日志同步关系;源包或目标包不是已配置的包时抛错。
+ */
+export function getSyncPackages(packageNames: string[]): PackageSync[] {
+  const syncs = parseSyncPackages()
+  const knownNames = new Set(packageNames)
+  syncs.forEach(({ source, targets }) => {
+    const unknownPackages = [source, ...targets].filter(name => !knownNames.has(name))
+    if (unknownPackages.length) {
+      throw new Error(`sync-packages references unknown packages: ${unknownPackages.join(', ')}`)
+    }
+    if (targets.includes(source)) {
+      throw new Error(`sync-packages source package cannot be its own target: ${source}`)
+    }
+  })
+  return syncs
+}
+
+/**
+ * 将源包日志追加到各目标包(目标包已有的相同条目不重复追加)。
+ * 源包条目取自同步前的结果,因此不做 a→b、b→c 的传递同步。
+ */
+export function syncChangelog(changelog: PackagesChangelog, syncs: PackageSync[]): PackagesChangelog {
+  if (!syncs.length) {
+    return changelog
+  }
+  const originalLogs = new Map(Object.entries(changelog))
+  const syncedChangelog = { ...changelog }
+  syncs.forEach(({ source, targets }) => {
+    const sourceLogs = originalLogs.get(source)
+    if (!sourceLogs?.length) {
+      return
+    }
+    targets.forEach((target) => {
+      const targetLogs = originalLogs.get(target)
+      if (!targetLogs) {
+        return
+      }
+      syncedChangelog[target] = [...targetLogs, ...sourceLogs.filter(log => !targetLogs.includes(log))]
+    })
+  })
+  return syncedChangelog
+}
+
+/**
+ * 普通 PR 预览评论的同步提示:仅在 body 中源包下确有日志时返回提示文案。
+ */
+export function getSyncHint(prLog: PackagesChangelog): string {
+  const hints = parseSyncPackages()
+    .filter(({ source }) => prLog[source]?.length)
+    .map(({ source, targets }) => `\`${source}\` 的日志会同步到 ${targets.map(target => `\`${target}\``).join('、')}`)
+  return hints.length ? `（${hints.join('；')}）` : ''
 }
 
 export function getSingleManifestPath(): string {

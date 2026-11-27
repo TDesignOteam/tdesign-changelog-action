@@ -1,6 +1,6 @@
 import type { Tokens } from 'marked'
 import type { PullRequestData, ReleasePackage } from '../src/types'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, unlinkSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { flutter_pull_request_files, merged_pull_request_files, merged_pull_request_files2, merged_pull_request_files3, pull_request_data, pull_request_files } from '../fixtures/pull_request_data'
 import {
@@ -15,11 +15,13 @@ import {
   getPullRequestReleaseDirs,
   getSingleManifestPath,
   getStashChangelog,
+  getSyncPackages,
   isExtractPRLog,
   parseMarkdown,
   pascalCase,
   renderChangelogMarkdown,
   stashPackageChangelog,
+  syncChangelog,
 } from '../src/utils/common'
 
 describe('utils', () => {
@@ -163,6 +165,133 @@ describe('utils', () => {
     //   expect(log).toBe(null)
     // })
   })
+  describe('getSyncPackages', () => {
+    it('未配置 sync-packages 时返回空数组', () => {
+      expect(getSyncPackages(['pkg-a'])).toEqual([])
+    })
+
+    it('解析逗号分隔与空白，同一源包多行合并', () => {
+      process.env['INPUT_SYNC-PACKAGES'] = 'pkg-a:pkg-b, pkg-c\npkg-a:pkg-d\n pkg-e : pkg-f '
+      try {
+        expect(getSyncPackages(['pkg-a', 'pkg-b', 'pkg-c', 'pkg-d', 'pkg-e', 'pkg-f'])).toEqual([
+          { source: 'pkg-a', targets: ['pkg-b', 'pkg-c', 'pkg-d'] },
+          { source: 'pkg-e', targets: ['pkg-f'] },
+        ])
+      }
+      finally {
+        delete process.env['INPUT_SYNC-PACKAGES']
+      }
+    })
+
+    it('引用未知包名时抛错', () => {
+      process.env['INPUT_SYNC-PACKAGES'] = 'pkg-a:pkg-unknown'
+      try {
+        expect(() => getSyncPackages(['pkg-a'])).toThrow('sync-packages references unknown packages: pkg-unknown')
+      }
+      finally {
+        delete process.env['INPUT_SYNC-PACKAGES']
+      }
+    })
+
+    it('源包指向自己时抛错', () => {
+      process.env['INPUT_SYNC-PACKAGES'] = 'pkg-a:pkg-a'
+      try {
+        expect(() => getSyncPackages(['pkg-a'])).toThrow('cannot be its own target: pkg-a')
+      }
+      finally {
+        delete process.env['INPUT_SYNC-PACKAGES']
+      }
+    })
+
+    it('缺少源包或目标时抛错', () => {
+      process.env['INPUT_SYNC-PACKAGES'] = 'pkg-a'
+      try {
+        expect(() => getSyncPackages(['pkg-a'])).toThrow('source:target1,target2')
+      }
+      finally {
+        delete process.env['INPUT_SYNC-PACKAGES']
+      }
+    })
+  })
+
+  describe('syncChangelog', () => {
+    it('源包日志追加到目标包，目标包自己的条目在前，不修改原结果', () => {
+      const packages = getPackages('fixtures/repo2')
+      const body = readFileSync('fixtures/pull_request_body/pr_body10.md', 'utf8')
+      const log = extractChangelog(body, packages.map(pkg => pkg.name))
+      expect(log).toEqual({
+        'pkg-a': ['feat(Button): New Component', 'chore(utils): add `isString` function'],
+        'pkg-b': ['fix(link): fix link'],
+        'pkg-c': [],
+      })
+      process.env['INPUT_SYNC-PACKAGES'] = 'pkg-a:pkg-b,pkg-c'
+      try {
+        const synced = syncChangelog(log, getSyncPackages(packages.map(pkg => pkg.name)))
+        expect(synced).toEqual({
+          'pkg-a': ['feat(Button): New Component', 'chore(utils): add `isString` function'],
+          'pkg-b': ['fix(link): fix link', 'feat(Button): New Component', 'chore(utils): add `isString` function'],
+          'pkg-c': ['feat(Button): New Component', 'chore(utils): add `isString` function'],
+        })
+        expect(log['pkg-b']).toEqual(['fix(link): fix link'])
+      }
+      finally {
+        delete process.env['INPUT_SYNC-PACKAGES']
+      }
+    })
+
+    it('与 all 叠加时不产生重复条目', () => {
+      const packages = getPackages('fixtures/repo2')
+      const body = readFileSync('fixtures/pull_request_body/pr_body4.md', 'utf8')
+      const log = extractChangelog(body, packages.map(pkg => pkg.name))
+      process.env['INPUT_SYNC-PACKAGES'] = 'pkg-a:pkg-b,pkg-c'
+      try {
+        const synced = syncChangelog(log, getSyncPackages(packages.map(pkg => pkg.name)))
+        expect(synced['pkg-b']).toEqual(['fix(link): fix link', 'feat(Button): New Component', 'chore(utils): add `isString` function'])
+        expect(synced['pkg-c']).toEqual(['feat(Button): New Component', 'chore(utils): add `isString` function'])
+      }
+      finally {
+        delete process.env['INPUT_SYNC-PACKAGES']
+      }
+    })
+
+    it('链式配置不传递', () => {
+      const synced = syncChangelog({
+        'pkg-a': ['feat(Button): New Component'],
+        'pkg-b': ['fix(link): fix link'],
+        'pkg-c': [],
+      }, [
+        { source: 'pkg-a', targets: ['pkg-b'] },
+        { source: 'pkg-b', targets: ['pkg-c'] },
+      ])
+      expect(synced['pkg-b']).toEqual(['fix(link): fix link', 'feat(Button): New Component'])
+      expect(synced['pkg-c']).toEqual(['fix(link): fix link'])
+    })
+
+    it('同步后写入各包暂存文件', () => {
+      const packages = getPackages('fixtures/repo2')
+      const body = readFileSync('fixtures/pull_request_body/pr_body10.md', 'utf8')
+      const log = extractChangelog(body, packages.map(pkg => pkg.name))
+      const prData = { ...pull_request_data, number: 8 }
+      stashPackageChangelog(prData, packages, syncChangelog(log, [{ source: 'pkg-a', targets: ['pkg-b', 'pkg-c'] }]))
+
+      try {
+        packages.forEach((pkg) => {
+          const text = readFileSync(`${pkg.dir}/.changelog/pr-${prData.number}.md`, 'utf8')
+          expect(text).toMatchSnapshot()
+        })
+      }
+      finally {
+        // 清理临时暂存文件,避免影响 getStashChangelog 等依赖 fixtures/repo2 已提交内容的快照
+        packages.forEach((pkg) => {
+          const file = `${pkg.dir}/.changelog/pr-${prData.number}.md`
+          if (existsSync(file)) {
+            unlinkSync(file)
+          }
+        })
+      }
+    })
+  })
+
   describe('stashPackageChangelog', () => {
     it('stashPackageChangelog1', () => {
       const packages = getPackages('fixtures/repo2')

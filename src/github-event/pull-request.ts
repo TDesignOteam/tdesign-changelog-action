@@ -2,7 +2,7 @@ import type { PullRequestData } from '../types'
 import { cwd } from 'node:process'
 import { getInput, info, setOutput, warning } from '@actions/core'
 import * as github from '@actions/github'
-import { buildReleaseComments, extractChangelog, getConfiguredPackages, getInputPkgs, getPullRequestNumber, getPullRequestReleaseDirs, getSingleManifestPath, getStashChangelog, getTagChangelog, isSingleMode, publishRelease, renderChangelogMarkdown, sortReleasePackages } from '../utils'
+import { buildReleaseComments, extractChangelog, getConfiguredPackages, getInputPkgs, getPullRequestNumber, getPullRequestReleaseDirs, getSingleManifestPath, getStashChangelog, getSyncHint, getTagChangelog, isSingleMode, publishRelease, renderChangelogMarkdown, sortReleasePackages } from '../utils'
 import useGit from '../utils/git'
 import useGithub from '../utils/github'
 import { translateText } from '../utils/translate'
@@ -31,7 +31,8 @@ export async function pull_request(token: string) {
         )
       })
       if (logs) {
-        const logHead = '(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的日志暂存区\n'
+        const syncHint = getSyncHint(prLog)
+        const logHead = `(删除此行代表确认该日志): 修改并确认日志后删除这一行，机器人会提交到 本 PR 的日志暂存区${syncHint}\n`
         const body = `${logHead}### 📝 更新日志\n\n${logs}\n\n <!-- FLOW-PR-CHANGELOG -->`
 
         setOutput('changelog', body)

@@ -5,6 +5,11 @@ export type PullRequestFiles = RestEndpointMethodTypes['pulls']['listFiles']['re
 export type PackagesChangelog = Record<string, string[]>
 export type PackageType = 'node' | 'flutter'
 
+export interface PackageSync {
+  source: string
+  targets: string[]
+}
+
 export interface ReleasePackage {
   dir: string
   name: string

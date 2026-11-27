@@ -6,7 +6,7 @@ import * as core from '@actions/core'
 import { exec } from '@actions/exec'
 import * as github from '@actions/github'
 import { globSync } from 'tinyglobby'
-import { checkIsForkPr, extractChangelog, extractReleaseLogs, getChangelogFilePath, getConfiguredPackages, getInputPkgs, getPrCommentWhitelist, getPullRequestNumber, getPullRequestReleaseDirs, stashPackageChangelog } from '../utils/common'
+import { checkIsForkPr, extractChangelog, extractReleaseLogs, getChangelogFilePath, getConfiguredPackages, getInputPkgs, getPrCommentWhitelist, getPullRequestNumber, getPullRequestReleaseDirs, getSyncPackages, isSingleMode, stashPackageChangelog, syncChangelog } from '../utils/common'
 import useGit from '../utils/git'
 import useGithub from '../utils/github'
 
@@ -113,11 +113,18 @@ export async function confirmChangelog(prNumber: number, log: string, token: str
   const pkgs = getConfiguredPackages(cwd())
   core.info(`pkgs: ${JSON.stringify(pkgs, null, 2)}`)
   const pkgNames = pkgs.map(p => p.name)
-  const changelog = extractChangelog(log || '', pkgNames.length ? pkgNames : getInputPkgs())
+  const changelogNames = pkgNames.length ? pkgNames : getInputPkgs()
+  const changelog = extractChangelog(log || '', changelogNames)
 
-  core.info(`stash_changelog: ${JSON.stringify(changelog, null, 2)}`)
+  const syncs = isSingleMode() ? [] : getSyncPackages(changelogNames)
+  const syncedChangelog = syncChangelog(changelog, syncs)
 
-  stashPackageChangelog(prData, pkgs, changelog)
+  core.info(`stash_changelog: ${JSON.stringify(syncedChangelog, null, 2)}`)
+  if (syncs.length) {
+    core.info(`sync_packages: ${JSON.stringify(syncs, null, 2)}`)
+  }
+
+  stashPackageChangelog(prData, pkgs, syncedChangelog)
   await exec('git', ['add', '**/pr-*.md'])
   await exec('git', ['status'])
   if (!await isNeedCommit()) {

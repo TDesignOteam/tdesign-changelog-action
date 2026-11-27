@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   checkoutCommit: vi.fn(),
   cloneRepo: vi.fn(),
   createRelease: vi.fn(),
+  extractChangelog: vi.fn(),
+  getSyncHint: vi.fn(),
   inputs: { mode: 'single' } as Record<string, string>,
   getInput: vi.fn((name: string) => mocks.inputs[name] || ''),
   getLatestTag: vi.fn(),
@@ -18,6 +20,7 @@ const mocks = vi.hoisted(() => ({
   getPullRequestReleaseDirs: vi.fn(),
   getTagChangelog: vi.fn(),
   publishRelease: vi.fn(),
+  setOutput: vi.fn(),
   context: {
     eventName: 'pull_request',
     payload: {} as any,
@@ -27,19 +30,20 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@actions/core', () => ({
   getInput: mocks.getInput,
   info: vi.fn(),
-  setOutput: vi.fn(),
+  setOutput: mocks.setOutput,
   warning: vi.fn(),
 }))
 vi.mock('@actions/github', () => ({ context: mocks.context }))
 vi.mock('../src/utils', () => ({
   buildReleaseComments: (head: string, sections: string[]) => sections.map(section => `${head}${section}`),
-  extractChangelog: vi.fn(),
+  extractChangelog: mocks.extractChangelog,
   getConfiguredPackages: () => [{ name: 'pkg-a' }],
   getInputPkgs: () => [],
   getPullRequestNumber: () => 42,
   getPullRequestReleaseDirs: mocks.getPullRequestReleaseDirs,
   getSingleManifestPath: () => mocks.inputs['manifest-path'] || 'package.json',
   getStashChangelog: vi.fn(),
+  getSyncHint: mocks.getSyncHint,
   getTagChangelog: mocks.getTagChangelog,
   isSingleMode: () => mocks.inputs.mode === 'single',
   publishRelease: mocks.publishRelease,
@@ -89,6 +93,39 @@ function pullRequestPayload(action: 'opened' | 'closed') {
     },
   }
 }
+
+describe('pull_request normal pr preview', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mocks.inputs = { mode: 'monorepo' }
+    mocks.context.eventName = 'pull_request'
+    mocks.context.payload = {
+      action: 'opened',
+      number: 42,
+      pull_request: {
+        base: { ref: 'main', repo: { full_name: 'owner/repo' } },
+        head: { ref: 'feat/button', sha: 'head-sha', repo: { full_name: 'owner/repo' } },
+      },
+    }
+    mocks.extractChangelog.mockReturnValue({ 'pkg-a': ['feat(Button): add loading state'] })
+    mocks.getSyncHint.mockReturnValue('')
+  })
+
+  it('outputs the changelog preview and appends the sync hint when configured', async () => {
+    mocks.getSyncHint.mockReturnValue('（`pkg-a` 的日志会同步到 `pkg-b`、`pkg-c`）')
+
+    await pull_request('token')
+
+    expect(mocks.getSyncHint).toHaveBeenCalledWith({ 'pkg-a': ['feat(Button): add loading state'] })
+    expect(mocks.setOutput).toHaveBeenCalledWith('changelog', expect.stringContaining('日志暂存区（`pkg-a` 的日志会同步到 `pkg-b`、`pkg-c`）'))
+  })
+
+  it('outputs the changelog preview without a sync hint by default', async () => {
+    await pull_request('token')
+
+    expect(mocks.setOutput).toHaveBeenCalledWith('changelog', expect.stringContaining('日志暂存区\n### 📝 更新日志'))
+  })
+})
 
 describe('pull_request single mode', () => {
   beforeEach(() => {
